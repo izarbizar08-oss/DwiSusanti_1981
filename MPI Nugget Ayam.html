@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="id" class="transition-colors duration-200">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia Pembelajaran - Pembuatan Chicken Nugget</title>
+    <!-- Tailwind CSS untuk tata letak modern, dinamis, dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter (Profesional) dan Fredoka (Siswa/Edukatif) -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome untuk koleksi ikon industri pangan dan lab sains -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlue: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        brandOrange: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        },
+                        brandGreen: {
+                            50: '#f0df4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        brand: ['Fredoka', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        .brand-text {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom scrollbar untuk area konten bergulir */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #f97316;
+        }
+        /* Efek shake untuk umpan balik jawaban salah */
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden antialiased">
+
+    <header class="bg-brandBlue-900 text-white shadow-xl py-3 px-4 md:px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+            <!-- Logo & Brand Info SMKN 1 Temanggung -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('screen-home')" title="Kembali ke Beranda">
+                <div class="bg-white text-brandBlue-900 w-11 h-11 rounded-full flex items-center justify-center font-bold shadow-md overflow-hidden p-1">
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-brandBlue-700">
+                        <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="none" stroke="currentColor" stroke-width="8"/>
+                        <circle cx="50" cy="50" r="22" fill="#f97316"/>
+                        <text x="50" y="56" fill="white" font-size="16" font-weight="bold" text-anchor="middle">SMK</text>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-text text-base md:text-lg font-bold tracking-wide text-brandOrange-100">SMK Negeri 1 Temanggung</h1>
+                    <p class="text-[10px] text-brandBlue-200 uppercase tracking-widest font-semibold">Agribisnis Pengolahan Hasil Pertanian</p>
+                </div>
+            </div>
+
+            <!-- Global Control HUD & Informasi Belajar -->
+            <div class="flex flex-wrap items-center justify-end gap-2 md:gap-4 w-full md:w-auto">
+                <!-- Breadcrumbs Navigasi Aktif -->
+                <div id="breadcrumb-widget" class="hidden md:flex items-center space-x-1.5 text-xs bg-brandBlue-800/50 px-3 py-1.5 rounded-full border border-brandBlue-700/60">
+                    <span class="text-brandOrange-100 font-semibold" id="bread-current-sec">Menu Utama</span>
+                </div>
+
+                <!-- Indikator Progres Belajar Aktif (%) -->
+                <div class="flex items-center space-x-2 text-xs text-brandBlue-200" title="Progres ketuntasan membaca materi & menyelesaikan game">
+                    <span class="font-bold text-white" id="progress-percentage-lbl">0%</span>
+                    <span>Progres</span>
+                    <div class="w-20 bg-brandBlue-950 h-2 rounded-full overflow-hidden border border-brandBlue-700">
+                        <div id="progress-indicator-bar" class="bg-brandOrange-500 h-2 w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Timer Belajar Mandiri Aktif -->
+                <div class="text-xs bg-slate-950/40 px-2.5 py-1.5 rounded-lg font-mono font-bold border border-brandBlue-800 flex items-center space-x-1" title="Durasi belajar mandiri Anda">
+                    <i class="fa-regular fa-clock text-brandOrange-500"></i>
+                    <span id="study-timer-lbl">00:00:00</span>
+                </div>
+
+                <!-- Pengontrol Sistem Audio Prosedural -->
+                <button id="audio-toggle-btn" onclick="toggleAudioSystem()" class="p-2 bg-brandBlue-800 hover:bg-brandBlue-700 rounded-full transition w-9 h-9 flex items-center justify-center border border-brandBlue-700 shadow" title="Aktifkan/Matikan Suara">
+                    <i id="audio-icon" class="fa-solid fa-volume-xmark text-sm"></i>
+                </button>
+
+                <!-- Tombol Alih Mode Gelap/Terang -->
+                <button onclick="toggleDarkMode()" class="p-2 bg-brandBlue-800 hover:bg-brandBlue-700 rounded-full transition w-9 h-9 flex items-center justify-center border border-brandBlue-700 shadow" title="Alihkan Mode Gelap/Terang">
+                    <i class="fa-solid fa-circle-half-stroke text-sm text-amber-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-3 md:p-6 max-w-7xl mx-auto w-full relative">
+
+        <!-- SCREEN 1: HALAMAN PEMBUKA -->
+        <div id="screen-home" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden p-6 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div class="w-full lg:w-1/2 space-y-6 text-center lg:text-left">
+                <span class="inline-flex items-center space-x-1.5 bg-brandOrange-50 text-brandOrange-700 dark:bg-brandOrange-950/40 dark:text-brandOrange-300 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider border border-brandOrange-200 dark:border-brandOrange-800">
+                    <i class="fa-solid fa-award"></i>
+                    <span>Multimedia Pembelajaran Interaktif</span>
+                </span>
+                <h2 class="brand-text text-4xl md:text-5xl font-extrabold text-brandBlue-900 dark:text-white leading-tight">
+                    Pembuatan <br><span class="text-brandOrange-500">Chicken Nugget</span>
+                </h2>
+                <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Pelajari rahasia sains formulasi, teknologi pengolahan emulsi daging, jaminan mutu kritis (CCP), serta penerapan standar K3LH higienis pengolahan daging unggas modern secara interaktif dan menyenangkan!
+                </p>
+
+                <!-- Identitas Kurikulum & Guru Pengampu -->
+                <div class="bg-slate-50 dark:bg-slate-900/50 border-l-4 border-brandOrange-500 p-4 rounded-r-2xl text-left space-y-1 text-xs md:text-sm text-slate-600 dark:text-slate-300 shadow-sm">
+                    <p class="flex items-center space-x-2"><i class="fa-solid fa-chalkboard-user text-brandBlue-600 dark:text-brandBlue-400"></i> <span><strong>Guru Pengampu:</strong> Dwi Susanti, S.TP.</span></p>
+                    <p class="flex items-center space-x-2"><i class="fa-solid fa-layer-group text-brandBlue-600 dark:text-brandBlue-400"></i> <span><strong>Mata Pelajaran:</strong> Pengolahan Hasil Hewani (XI APHP)</span></p>
+                    <p class="flex items-center space-x-2"><i class="fa-solid fa-school text-brandBlue-600 dark:text-brandBlue-400"></i> <span><strong>Lokasi:</strong> SMK Negeri 1 Temanggung</span></p>
+                </div>
+
+                <button onclick="showScreen('screen-menu')" class="px-8 py-4 bg-brandOrange-500 hover:bg-brandOrange-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-brandOrange-200 dark:hover:shadow-none transition-all duration-300 transform hover:-translate-y-1 text-base md:text-lg flex items-center justify-center space-x-2 mx-auto lg:mx-0">
+                    <span>Mulai Belajar</span>
+                    <i class="fa-solid fa-arrow-right animate-pulse"></i>
+                </button>
+            </div>
+
+            <!-- Visualisasi Ilustrasi SVG Interaktif -->
+            <div class="w-full lg:w-1/2 flex justify-center">
+                <div class="relative w-72 h-72 md:w-96 md:h-96 bg-gradient-to-tr from-brandBlue-500/10 to-brandOrange-500/10 rounded-full flex items-center justify-center border-4 border-dashed border-brandBlue-500/20 p-4">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <path d="M70,80 L70,30 L130,30 L130,80 L160,140 A20,20 0 0,1 140,170 L60,170 A20,20 0 0,1 40,140 Z" fill="#0284c7" opacity="0.2"/>
+                        <path d="M47,145 Q100,160 153,145 L140,170 L60,170 Z" fill="#f97316" opacity="0.7"/>
+                        <circle cx="100" cy="120" r="8" fill="#ffffff" opacity="0.4"/>
+                        <circle cx="80" cy="140" r="5" fill="#ffffff" opacity="0.4"/>
+                        <circle cx="120" cy="135" r="6" fill="#ffffff" opacity="0.4"/>
+                        <ellipse cx="100" cy="100" rx="35" ry="15" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
+                        <rect x="80" y="85" width="16" height="12" rx="3" fill="#f59e0b" stroke="#d97706" stroke-width="1.5" transform="rotate(-15, 80, 85)"/>
+                        <rect x="105" y="88" width="18" height="11" rx="3" fill="#ea580c" stroke="#b45309" stroke-width="1.5" transform="rotate(10, 105, 88)"/>
+                        <rect x="92" y="93" width="15" height="13" rx="3" fill="#f59e0b" stroke="#d97706" stroke-width="1.5"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: MENU UTAMA -->
+        <div id="screen-menu" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="text-center md:text-left">
+                <span class="text-xs font-bold text-brandBlue-600 dark:text-brandBlue-400 uppercase tracking-widest"><i class="fa-solid fa-list-check"></i> Gerbang Pembelajaran</span>
+                <h3 class="brand-text text-2xl md:text-3xl font-extrabold text-brandBlue-900 dark:text-white mt-1">Menu Utama Dashboard</h3>
+            </div>
+
+            <!-- Grid Kartu Menu Interaktif -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Petunjuk -->
+                <div onclick="showScreen('screen-petunjuk')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Petunjuk</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Cara menjelajahi media belajar</p>
+                    </div>
+                </div>
+
+                <!-- Capaian Pembelajaran -->
+                <div onclick="showScreen('screen-capaian')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Capaian & CP</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Kriteria kompetensi Kurikulum</p>
+                    </div>
+                </div>
+
+                <!-- Tujuan Pembelajaran -->
+                <div onclick="showScreen('screen-tujuan')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Tujuan Belajar</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Target kemampuan siswa</p>
+                    </div>
+                </div>
+
+                <!-- Materi -->
+                <div onclick="showScreen('screen-materi')" class="bg-slate-50 hover:bg-brandOrange-50 dark:bg-slate-900/50 dark:hover:bg-brandOrange-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandOrange-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandOrange-100 dark:bg-brandOrange-900 text-brandOrange-600 dark:text-brandOrange-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Materi Interaktif</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Sains & Langkah Proses</p>
+                    </div>
+                </div>
+
+                <!-- Video Pembelajaran -->
+                <div onclick="showScreen('screen-video')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Video Praktek</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Demonstrasi visual industri</p>
+                    </div>
+                </div>
+
+                <!-- Simulasi Proses -->
+                <div onclick="showScreen('screen-simulasi')" class="bg-slate-50 hover:bg-brandGreen-50 dark:bg-slate-900/50 dark:hover:bg-brandGreen-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandGreen-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandGreen-100 dark:bg-brandGreen-900 text-brandGreen-600 dark:text-brandGreen-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-vial-virus"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Simulasi Proses</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Percobaan lab interaktif</p>
+                    </div>
+                </div>
+
+                <!-- Game Edukasi -->
+                <div onclick="showScreen('screen-games')" class="bg-slate-50 hover:bg-brandOrange-50 dark:bg-slate-900/50 dark:hover:bg-brandOrange-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandOrange-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandOrange-100 dark:bg-brandOrange-900 text-brandOrange-600 dark:text-brandOrange-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Game Edukasi</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">7 macam permainan seru</p>
+                    </div>
+                </div>
+
+                <!-- Latihan Soal -->
+                <div onclick="showScreen('screen-latihan')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Latihan Soal</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Kuis kognitif acak 20 soal</p>
+                    </div>
+                </div>
+
+                <!-- Evaluasi Akhir -->
+                <div onclick="showScreen('screen-evaluasi')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-file-shield"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Evaluasi Uji</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Ujian utama ber-sertifikat</p>
+                    </div>
+                </div>
+
+                <!-- Glosarium -->
+                <div onclick="showScreen('screen-glosarium')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-spell-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Glosarium</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Kamus istilah ilmiah penting</p>
+                    </div>
+                </div>
+
+                <!-- Referensi -->
+                <div onclick="showScreen('screen-referensi')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Referensi</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Daftar pustaka & sumber ilmiah</p>
+                    </div>
+                </div>
+
+                <!-- Profil Guru -->
+                <div onclick="showScreen('screen-profil')" class="bg-slate-50 hover:bg-brandBlue-50 dark:bg-slate-900/50 dark:hover:bg-brandBlue-950/20 border border-slate-200 dark:border-slate-700 hover:border-brandBlue-300 p-4 rounded-2xl cursor-pointer transition-all transform hover:-translate-y-1 flex flex-col items-center text-center space-y-3 shadow-sm group">
+                    <div class="p-3 bg-brandBlue-100 dark:bg-brandBlue-900 text-brandBlue-600 dark:text-brandBlue-300 rounded-full text-xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs md:text-sm text-slate-800 dark:text-white">Profil Guru</h4>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Guru pengampu mata pelajaran</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: PETUNJUK -->
+        <div id="screen-petunjuk" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Petunjuk Belajar</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+            <div class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scroll">
+                <p>Selamat datang di multimedia interaktif! Untuk mendapatkan pengalaman belajar yang maksimal, ikuti langkah berikut:</p>
+                <ul class="list-decimal list-inside space-y-2">
+                    <li>Bacalah <strong>Materi Pembelajaran</strong> secara berurutan. Setiap slide yang Anda baca akan berkontribusi langsung ke peningkatan persentase progres belajar Anda pada bar di bagian header.</li>
+                    <li>Gunakan menu <strong>Simulasi Proses</strong> untuk melihat alur kerja produksi secara grafis berurutan dengan menyentuh tombol "Mulai" dan "Lanjut Proses".</li>
+                    <li>Selesaikan tantangan di menu <strong>Game Edukasi</strong> untuk menguji pengetahuan taktis Anda dengan 7 ragam mini games.</li>
+                    <li>Kerjakan <strong>Latihan Soal</strong> untuk mematangkan ingatan kognitif Anda tanpa takut salah karena dilengkapi umpan balik pembahasan.</li>
+                    <li>Buktikan kemampuan Anda di menu <strong>Evaluasi Akhir</strong> untuk berkesempatan memecahkan batas kelulusan nilai 80 guna mengklaim dan mencetak sertifikat digital keahlian.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SCREEN: CAPAIAN PEMBELAJARAN -->
+        <div id="screen-capaian" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Capaian Pembelajaran (CP)</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+            <div class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scroll">
+                <div class="bg-brandBlue-50 dark:bg-brandBlue-950/20 p-4 rounded-xl border border-brandBlue-100 dark:border-brandBlue-800">
+                    <p class="font-bold text-brandBlue-900 dark:text-brandBlue-200 text-xs uppercase tracking-wide">Konsentrasi Keahlian: Agribisnis Pengolahan Hasil Pertanian</p>
+                    <p class="mt-2">Peserta didik mampu melakukan pengolahan hasil hewani meliputi pengolahan daging unggas dengan menerapkan prosedur kerja yang aman, higienis (GMP, SSOP), mengendalikan mutu hasil proses, serta melakukan pengemasan dan penyimpanan produk sesuai standar kualitas industri pangan.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: TUJUAN PEMBELAJARAN -->
+        <div id="screen-tujuan" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Tujuan Pembelajaran</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[350px] overflow-y-auto pr-2 custom-scroll">
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 border rounded-xl flex items-start space-x-2.5">
+                    <span class="bg-brandOrange-500 text-white w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+                    <p class="text-xs">Menjelaskan pengertian chicken nugget komersial dengan tepat.</p>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 border rounded-xl flex items-start space-x-2.5">
+                    <span class="bg-brandOrange-500 text-white w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+                    <p class="text-xs">Mengidentifikasi seluruh bahan baku utama, pengikat, pengisi, serta fungsi kimiawinya.</p>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 border rounded-xl flex items-start space-x-2.5">
+                    <span class="bg-brandOrange-500 text-white w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</span>
+                    <p class="text-xs">Merincikan peralatan produksi pengolahan daging beserta fungsi mekanisnya.</p>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 border rounded-xl flex items-start space-x-2.5">
+                    <span class="bg-brandOrange-500 text-white w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">4</span>
+                    <p class="text-xs">Menyusun alur kerja proses produksi dari pemotongan hingga pembekuan.</p>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 border rounded-xl flex items-start space-x-2.5">
+                    <span class="bg-brandOrange-500 text-white w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">5</span>
+                    <p class="text-xs">Menganalisis Titik Kendali Kritis (CCP) parameter suhu, waktu, dan penanganan higienis.</p>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 border rounded-xl flex items-start space-x-2.5">
+                    <span class="bg-brandOrange-500 text-white w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">6</span>
+                    <p class="text-xs">Mengevaluasi standar kualitas mutu chicken nugget berdasarkan kriteria fisikokimia SNI.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: MATERI INTERAKTIF -->
+        <div id="screen-materi" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-4 md:p-8 flex flex-col justify-between min-h-[500px]">
+            <!-- Header Slide -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b pb-3 mb-4">
+                <div>
+                    <span class="text-xs font-bold text-brandOrange-600 uppercase tracking-widest" id="materi-category-lbl">Modul Keilmuan</span>
+                    <h3 class="brand-text text-lg md:text-xl font-bold text-brandBlue-900 dark:text-white" id="materi-title-lbl">Judul Slide Materi</h3>
+                </div>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-xs font-bold rounded-lg transition">Tutup Slide</button>
+            </div>
+
+            <!-- Main Slide Content Container -->
+            <div id="materi-slide-container" class="flex-grow flex flex-col justify-center min-h-[250px] overflow-y-auto max-h-[350px] pr-2 custom-scroll">
+                <!-- Diisi dinamis oleh JavaScript -->
+            </div>
+
+            <!-- Footer Slide Navigation -->
+            <div class="flex justify-between items-center border-t pt-4 mt-4">
+                <button onclick="prevMateriSlide()" id="materi-prev-btn" class="px-4 py-2 border rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">Kembali</button>
+                <span class="text-xs font-bold text-slate-400" id="materi-index-lbl">Slide 1 / 10</span>
+                <button onclick="nextMateriSlide()" id="materi-next-btn" class="px-5 py-2.5 bg-brandOrange-500 text-white font-bold rounded-xl text-xs transition flex items-center space-x-1.5 shadow-md hover:bg-brandOrange-600">Lanjut</button>
+            </div>
+        </div>
+
+        <!-- SCREEN: VIDEO PEMBELAJARAN -->
+        <div id="screen-video" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Video Pembelajaran</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <!-- Video Player Container (Penyematan Video Terpilih) -->
+                <div class="relative aspect-video w-full bg-slate-900 rounded-2xl overflow-hidden border shadow-inner">
+                    <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/3qA-ESoweq0" title="Proses Pembuatan Chicken Nugget" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+
+                <div class="space-y-4 text-xs md:text-sm text-slate-600 dark:text-slate-300">
+                    <h4 class="font-bold text-brandBlue-900 dark:text-brandBlue-200 uppercase tracking-wider">Poin Penting Pengamatan Video:</h4>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Amati struktur kekentalan pasta emulsi daging (adonan) setelah proses pencampuran menggunakan *silent cutter*.</li>
+                        <li>Perhatikan perbedaan tekstur luar sebelum dan sesudah melalui fase *pre-frying* minyak panas (170-180°C).</li>
+                        <li>Amati bagaimana operator industri menerapkan higiene total (mencuci tangan, memakai apron, sarung tangan, penutup kepala) guna mencegah kontaminasi fisik dan mikrobiologis.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: SIMULASI PROSES -->
+        <div id="screen-simulasi" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Simulasi Laboratorium Proses</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+
+            <!-- Simulasi Wizard Board -->
+            <div class="bg-slate-50 dark:bg-slate-900/50 border rounded-2xl p-5 relative" id="sim-wizard-board">
+                <!-- Simulasi dynamic renderer -->
+                <div id="sim-dynamic-panel" class="min-h-[220px] flex flex-col justify-center">
+                    <!-- JavaScript renders active simulation process step here -->
+                </div>
+
+                <!-- Action Simulation Controls -->
+                <div class="flex justify-between items-center mt-6 pt-4 border-t">
+                    <button id="sim-prev-btn" onclick="prevSimStep()" class="text-xs font-semibold text-slate-500 hover:text-slate-700 transition" disabled>Proses Sebelumnya</button>
+                    <span class="text-xs font-bold text-slate-400" id="sim-step-indicator">Proses 1 / 13</span>
+                    <button id="sim-next-btn" onclick="nextSimStep()" class="px-5 py-2 bg-brandGreen-600 hover:bg-brandGreen-700 text-white rounded-xl text-xs font-bold transition">Mulai Proses</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: GAME EDUKASI -->
+        <div id="screen-games" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Aktivitas & Game Edukasi</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+
+            <!-- Tab Buttons for Games Selector -->
+            <div class="flex flex-wrap gap-2" id="games-tab-bar">
+                <button onclick="selectGameTab('bahan')" id="gtab-bahan" class="px-3.5 py-1.5 bg-brandOrange-500 text-white rounded-lg text-xs font-bold transition">A. Pilih Bahan</button>
+                <button onclick="selectGameTab('alur')" id="gtab-alur" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition">B. Sorter Alur</button>
+                <button onclick="selectGameTab('alat')" id="gtab-alat" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition">C. Cocokkan Alat</button>
+                <button onclick="selectGameTab('gmp')" id="gtab-gmp" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition">D. Detektif GMP (8 Eror)</button>
+                <button onclick="selectGameTab('memory')" id="gtab-memory" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition">E. Memory Card</button>
+                <button onclick="selectGameTab('wheel')" id="gtab-wheel" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition">F. Roda Kuis</button>
+                <button onclick="selectGameTab('bs')" id="gtab-bs" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition">G. Benar/Salah</button>
+            </div>
+
+            <!-- Workspace Render Screen for Selected Game -->
+            <div id="game-workspace" class="bg-slate-50 dark:bg-slate-900/50 border rounded-3xl p-5 min-h-[300px] flex flex-col justify-between">
+                <!-- Javascript will load specific game interface dynamically based on tab selection -->
+            </div>
+        </div>
+
+        <!-- SCREEN: LATIHAN SOAL -->
+        <div id="screen-latihan" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-4 md:p-8 flex flex-col justify-between min-h-[480px]">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-3 gap-2">
+                <div>
+                    <span class="text-xs font-bold text-brandBlue-600 uppercase tracking-widest">Uji Coba Latihan Mandiri</span>
+                    <h3 class="brand-text text-lg md:text-xl font-bold text-brandBlue-900 dark:text-white">Asesmen Formatif Kognitif</h3>
+                </div>
+                <div class="flex items-center space-x-3 text-xs font-bold">
+                    <span class="bg-slate-100 dark:bg-slate-700 py-1.5 px-3 rounded-lg border dark:border-slate-600">Soal: <strong id="lat-progress-lbl">1/20</strong></span>
+                    <span class="bg-brandOrange-100 dark:bg-brandOrange-950/40 text-brandOrange-700 dark:text-brandOrange-300 py-1.5 px-3 rounded-lg border dark:border-brandOrange-900">Skor: <strong id="lat-score-lbl">0</strong></span>
+                    <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg transition">Tutup</button>
+                </div>
+            </div>
+
+            <!-- Question Card Workspace -->
+            <div class="bg-slate-50 dark:bg-slate-900/40 border rounded-2xl p-5 flex-grow flex flex-col justify-center min-h-[220px]" id="lat-question-card">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- SCREEN: EVALUASI AKHIR -->
+        <div id="screen-evaluasi" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-4 md:p-8 flex flex-col justify-between min-h-[500px]">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-3 gap-2">
+                <div>
+                    <span class="text-xs font-bold text-brandOrange-600 uppercase tracking-widest">Ujian Utama Evaluasi Kompetensi</span>
+                    <h3 class="brand-text text-lg md:text-xl font-bold text-brandBlue-900 dark:text-white">Uji Akhir Hasil Hewani</h3>
+                </div>
+                <div class="flex items-center space-x-3 text-xs font-bold">
+                    <span class="bg-slate-100 dark:bg-slate-700 py-1.5 px-3 rounded-lg border dark:border-slate-600">Soal: <strong id="eval-progress-lbl">1/15</strong></span>
+                    <span class="bg-brandOrange-100 dark:bg-brandOrange-950/40 text-brandOrange-700 dark:text-brandOrange-300 py-1.5 px-3 rounded-lg border dark:border-brandOrange-900">Poin: <strong id="eval-score-lbl">0</strong></span>
+                    <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg transition">Tutup</button>
+                </div>
+            </div>
+
+            <!-- Evaluasi Card Workspace -->
+            <div class="bg-slate-50 dark:bg-slate-900/40 border rounded-2xl p-5 flex-grow flex flex-col justify-center min-h-[220px]" id="eval-question-card">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- SCREEN: GLOSARIUM -->
+        <div id="screen-glosarium" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Glosarium Sains Pangan</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+            <!-- Glosarium Search & List -->
+            <div class="space-y-4">
+                <input type="text" id="glosarium-search" oninput="filterGlosarium(this.value)" placeholder="Cari istilah sains (misal: Emulsifikasi, Breading)..." class="w-full text-xs p-3 border dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 outline-none rounded-xl focus:ring-1 focus:ring-brandOrange-500">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[250px] overflow-y-auto pr-2 custom-scroll" id="glosarium-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: REFERENSI -->
+        <div id="screen-referensi" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Daftar Pustaka & Referensi</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+            <div class="text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scroll">
+                <p class="border-b pb-2"><strong>[1] SNI 6683:2014</strong> - Standar Nasional Indonesia untuk produk olahan daging ayam berupa Chicken Nugget unggas komersial.</p>
+                <p class="border-b pb-2"><strong>[2] Winarno, F.G. (2004)</strong> - *Kimia Pangan dan Gizi*. Jakarta: Penerbit Gramedia Pustaka Utama. (Mengulas asas sains denaturasi, emulsifikasi protein hewani).</p>
+                <p class="border-b pb-2"><strong>[3] BPOM RI</strong> - Peraturan terkait batas maksimum penggunaan Bahan Tambahan Pangan (BTP) jenis fosfat pada produk olahan pangan hewani.</p>
+            </div>
+        </div>
+
+        <!-- SCREEN: PROFIL GURU -->
+        <div id="screen-profil" class="screen-view w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hidden p-6 md:p-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="brand-text text-xl md:text-2xl font-bold text-brandBlue-900 dark:text-white">Profil Guru Pengampu</h3>
+                <button onclick="showScreen('screen-menu')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg transition">Kembali ke Menu</button>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <!-- Profile Avatar Placeholder -->
+                <div class="w-32 h-32 md:w-44 md:h-44 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden border-4 border-brandOrange-500 shadow-lg flex items-center justify-center relative">
+                    <svg viewBox="0 0 100 100" class="w-24 h-24 text-slate-400">
+                        <path d="M50 15 A18 18 0 0 1 50 51 A18 18 0 0 1 50 15 Z M10 85 C10 65 30 55 50 55 C70 55 90 65 90 85 Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="space-y-3 text-center md:text-left">
+                    <h4 class="brand-text text-xl font-bold text-brandBlue-900 dark:text-white">Dwi Susanti, S.TP.</h4>
+                    <p class="text-xs font-semibold text-brandOrange-500 uppercase tracking-widest">NIP. - / Guru Agribisnis Hasil Hewani</p>
+                    <p class="text-xs md:text-sm text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
+                        Mengampu mata pelajaran Pengolahan Hasil Hewani untuk Program Keahlian Agribisnis Pengolahan Hasil Pertanian (APHP) di SMK Negeri 1 Temanggung. Memiliki dedikasi membimbing siswa menguasai kompetensi teknologi pangan secara teoritis dan praktis guna mempersiapkan wirausahawan milenial.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: DIGITAL CERTIFICATE -->
+    <div id="cert-modal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-3xl p-6 max-w-3xl w-full border-8 border-brandBlue-900 relative shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h4 class="brand-text text-base font-bold text-brandBlue-900 flex items-center"><i class="fa-solid fa-certificate text-brandOrange-500 mr-2"></i> Sertifikat Penyelesaian Pembelajaran</h4>
+                <div class="flex space-x-2">
+                    <button onclick="window.print()" class="px-3 py-1.5 bg-brandGreen-600 text-white text-xs font-bold rounded-lg hover:bg-brandGreen-700 transition" title="Cetak Sertifikat / Simpan sebagai PDF"><i class="fa-solid fa-print"></i> Cetak</button>
+                    <button onclick="downloadCertificateOffline()" class="px-3 py-1.5 bg-brandBlue-600 text-white text-xs font-bold rounded-lg hover:bg-brandBlue-700 transition" title="Unduh File Sertifikat HTML Mandiri"><i class="fa-solid fa-download"></i> Unduh File</button>
+                    <button onclick="closeCertModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300 transition">Tutup</button>
+                </div>
+            </div>
+
+            <!-- Print Canvas Container -->
+            <div id="cert-print-area" class="border-4 border-brandOrange-400 p-6 md:p-10 rounded-2xl bg-stone-50 text-center space-y-4 relative overflow-hidden bg-[radial-gradient(#0369a1_1px,transparent_1px)] [background-size:20px_20px] [background-color:#fafaf9] text-slate-800">
+                <span class="text-[10px] uppercase font-bold tracking-widest text-brandBlue-700">Sertifikat Hasil Belajar Mandiri (SMK)</span>
+                <h3 class="brand-text text-2xl md:text-3xl font-extrabold text-brandBlue-900 mt-2">SERTIFIKAT KELULUSAN</h3>
+                <p class="text-[11px] text-slate-500 uppercase tracking-wider mt-1">Mata Pelajaran: Pengolahan Hasil Hewani (XI)</p>
+                
+                <div class="py-4">
+                    <p class="text-xs italic text-slate-500">Menerangkan bahwa peserta didik:</p>
+                    <input type="text" id="cert-student-name" value="NAMA SISWA SMK" class="w-full max-w-md mx-auto text-center font-bold text-lg md:text-xl text-brandOrange-600 border-b-2 border-dashed border-slate-300 focus:border-brandBlue-600 focus:outline-none py-1 bg-transparent uppercase" title="Klik untuk mengedit Nama Anda">
+                    <p class="text-[9px] text-slate-400 mt-1">Lulus Kriteria Kognitif Uji Kompetensi Pembuatan Chicken Nugget dengan predikat:</p>
+                </div>
+
+                <div class="inline-block py-1.5 px-6 bg-brandBlue-900 text-white rounded-full font-bold uppercase tracking-wider text-xs shadow" id="cert-predikat-lbl">
+                    NUGGET MASTER GRADUATE
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 max-w-lg mx-auto text-[9px] text-left text-slate-500 pt-4 border-t border-slate-200">
+                    <div><i class="fa-solid fa-check text-brandGreen-600 mr-1"></i> Formulasi Bahan</div>
+                    <div><i class="fa-solid fa-check text-brandGreen-600 mr-1"></i> Sanitasi GMP</div>
+                    <div><i class="fa-solid fa-check text-brandGreen-600 mr-1"></i> Emulsifikasi Gel</div>
+                    <div><i class="fa-solid fa-check text-brandGreen-600 mr-1"></i> Critical Control Point</div>
+                </div>
+
+                <div class="flex justify-between items-end pt-6 max-w-xl mx-auto text-left text-[10px] text-slate-600">
+                    <div>
+                        <p>Tanggal Kelulusan:</p>
+                        <p id="cert-current-date" class="font-bold text-slate-800">7 Juli 2026</p>
+                    </div>
+                    <div class="text-center">
+                        <p>Mengetahui,</p>
+                        <div class="h-6 flex items-center justify-center relative font-brand text-brandBlue-600/20 text-sm rotate-[-3deg]">Dwi Susanti, S.TP.</div>
+                        <p class="font-bold underline text-slate-800 mt-1">Dwi Susanti, S.TP.</p>
+                        <p class="text-[8px] text-slate-400">Guru Bidang Hasil Hewani</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: INFO NOTIF MESSAGE SYSTEM -->
+    <div id="msg-modal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-4 z-[60]">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 text-slate-800">
+            <div id="msg-icon-wrapper" class="inline-flex p-3 rounded-full text-4xl">
+                <i id="msg-icon" class="fa-solid fa-circle-info"></i>
+            </div>
+            <h4 id="msg-title" class="font-bold text-lg text-slate-900">Judul</h4>
+            <p id="msg-body" class="text-xs md:text-sm text-slate-600">Isi pesan informasi.</p>
+            <button onclick="closeMsgModal()" class="w-full py-2.5 bg-brandBlue-900 hover:bg-brandBlue-800 text-white rounded-xl text-xs font-bold transition shadow">OK</button>
+        </div>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="bg-brandBlue-900 text-brandBlue-200 text-center py-4 text-[10px] md:text-xs border-t border-brandBlue-800 mt-6">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+            <p>&copy; 2026 Agribisnis Pengolahan Hasil Pertanian - SMK Negeri 1 Temanggung.</p>
+            <p class="text-brandBlue-300">Kurikulum Merdeka Mandiri Belajar Offline-Ready.</p>
+        </div>
+    </footer>
+
+    <script>
+        // State Global Aplikasi Pembelajaran
+        let appState = {
+            activeScreen: "screen-home",
+            audioMuted: true,
+            audioCtx: null,
+            timerInterval: null,
+            elapsedSeconds: 0,
+            learningProgress: {}, // Menyimpan slide materi dan game yang diselesaikan
+            activeMateriSlide: 0,
+            activeSimStep: 1,
+            activeGameTab: 'bahan',
+            
+            // Latihan Soal State
+            latihanQuestions: [],
+            latihanIndex: 0,
+            latihanScore: 0,
+
+            // Evaluasi Akhir State
+            evalIndex: 0,
+            evalScore: 0,
+            evalAnswers: [],
+            
+            // Memory Game State
+            memoryCards: [],
+            memorySelected: [],
+            memoryLock: false,
+            memoryMatches: 0,
+
+            // Spin Wheel Game State
+            wheelInAction: false
+        };
+
+        // Database Slide Materi Pembelajaran (10 Slide)
+        const MATERI_DATABASE = [
+            {
+                category: "1. Pengertian",
+                title: "Apa itu Chicken Nugget?",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed"><strong>Chicken Nugget</strong> adalah produk olahan daging ayam restrukturisasi (*restructured meat*) komersial yang dicetak, dikukus, dilapis tepung basah dan panir, kemudian digoreng cepat (*pre-frying*) dan dibekukan.</p>
+                        <div class="bg-brandBlue-50 dark:bg-brandBlue-950/20 p-3.5 rounded-xl border border-brandBlue-200 dark:border-brandBlue-900 text-slate-700 dark:text-slate-300">
+                            💡 <strong>Fakta Sains:</strong> Struktur empuk nugget terjadi karena integrasi jalinan emulsi serabut daging (*miofibril protein*) yang mengurung partikel air bebas dan butiran lemak mikro secara seimbang.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                category: "2. Formulasi Bahan",
+                title: "Bahan Baku Utama & Bahan Tambahan",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed">Keberhasilan kualitas nugget ditentukan oleh komposisi formulasi bahan baku yang presisi:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-700 dark:text-slate-300">
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg flex items-start space-x-2">
+                                <span class="text-base">🥩</span>
+                                <div><strong class="text-slate-900 dark:text-white">Daging Ayam Segar:</strong> Sumber protein miosin-aktin pelarut garam yang membangun matriks emulsi kenyal.</div>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg flex items-start space-x-2">
+                                <span class="text-base">🧊</span>
+                                <div><strong class="text-slate-900 dark:text-white">Es Batu / Air Dingin:</strong> Menjaga kestabilan suhu adonan giling agar tetap &lt; 15°C.</div>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg flex items-start space-x-2">
+                                <span class="text-base">🧪</span>
+                                <div><strong class="text-slate-900 dark:text-white">STPP (Phosphate):</strong> Meningkatkan kapasitas ikat air (*Water Holding Capacity* / WHC).</div>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg flex items-start space-x-2">
+                                <span class="text-base">🧂</span>
+                                <div><strong class="text-slate-900 dark:text-white">Garam & Bumbu:</strong> Melarutkan protein myofibril sekaligus memberi aroma gurih.</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                category: "3. Peran Bahan Pembantu",
+                title: "Fungsi Tepung Pengisi & Pengikat",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed">Bahan tambahan non-daging memiliki peran krusial bagi tekstur akhir:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-center text-slate-700 dark:text-slate-300">
+                            <div class="p-3 border dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl">
+                                <span class="text-xl">🌽</span>
+                                <h5 class="font-bold text-slate-900 dark:text-white mt-1 text-xs">Tepung Tapioka (Pati)</h5>
+                                <p class="text-[10px] text-slate-500 mt-1">Bertindak sebagai *filler* (pengisi) yang menyerap air hidrasi pati guna menopang volume kompak.</p>
+                            </div>
+                            <div class="p-3 border dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl">
+                                <span class="text-xl">🌾</span>
+                                <h5 class="font-bold text-slate-900 dark:text-white mt-1 text-xs">Tepung Terigu (Gluten)</h5>
+                                <p class="text-[10px] text-slate-500 mt-1">Bertindak sebagai *binder* (pengikat) penjalin serat adonan agar tidak mudah pecah.</p>
+                            </div>
+                            <div class="p-3 border dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-xl">
+                                <span class="text-xl">🥚</span>
+                                <h5 class="font-bold text-slate-900 dark:text-white mt-1 text-xs">Telur Ayam (Lesitin)</h5>
+                                <p class="text-[10px] text-slate-500 mt-1">Mengandung emulsifier alami yang memperkokoh penggabungan molekul air dan lemak.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                category: "4. Peralatan",
+                title: "Mengenal Peralatan Produksi Pangan",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed">Pengolahan daging skala komersial menggunakan instrumen mutakhir stainless steel inert (bebas karat):</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-slate-700 dark:text-slate-300">
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                                <span class="text-xl">⚙️</span>
+                                <h6 class="font-bold text-slate-900 dark:text-white text-[11px] mt-1">Meat Grinder</h6>
+                                <p class="text-[9px] text-slate-400 mt-0.5">Memperkecil serat daging ayam kasar.</p>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                                <span class="text-xl">🥣</span>
+                                <h6 class="font-bold text-slate-900 dark:text-white text-[11px] mt-1">Silent Cutter</h6>
+                                <p class="text-[9px] text-slate-400 mt-0.5">Mencampur emulsi adonan berkecepatan tinggi.</p>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                                <span class="text-xl">🌡️</span>
+                                <h6 class="font-bold text-slate-900 dark:text-white text-[11px] mt-1">Steamer</h6>
+                                <p class="text-[9px] text-slate-400 mt-0.5">Mengukus matang denaturasi gel.</p>
+                            </div>
+                            <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                                <span class="text-xl">🍟</span>
+                                <h6 class="font-bold text-slate-900 dark:text-white text-[11px] mt-1">Deep Fryer</h6>
+                                <p class="text-[9px] text-slate-400 mt-0.5">Menggoreng cepat pengering panir.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                category: "5. Alur Proses",
+                title: "Skema Linear Tahapan Produksi",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed">Diagram alir linear pembuatan chicken nugget modern wajib dipatuhi secara runut:</p>
+                        <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border flex flex-wrap gap-2.5 justify-center text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                            <span>Persiapan</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Giling</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Pencampuran</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Cetak</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Kukus</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Potong</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Batter/Breading</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Pre-frying</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Kemas</span> <i class="fa-solid fa-arrow-right self-center text-brandOrange-500"></i>
+                            <span>Simpan Beku</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                category: "6. Tahapan Proses",
+                title: "Sains di balik Batter & Breading",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed"><strong>Pelapisan Tepung Basah (Battering)</strong> dan <strong>Tepung Panir (Breading)</strong> membentuk karakteristik garing luar (*crispiness*) yang khas pada nugget:</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                            <li><strong>Batter Mix:</strong> Campuran tepung terigu dan air bertindak sebagai "perekat basah" bertekstur kental lengket.</li>
+                            <li><strong>Bread Crumb:</strong> Tepung roti bertekstur kasar akan menyelimuti merata di atas lapisan batter.</li>
+                            <li><strong>Pre-frying (Pematangan awal):</strong> Digoreng cepat 170-180°C selama 30 detik untuk mengkristalkan lapisan tepung roti tanpa mematangkan bagian daging dalam secara menyeluruh.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                category: "7. Jaminan Mutu",
+                title: "Titik Kendali Kritis (HACCP/CCP)",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed"><strong>Critical Control Point (CCP)</strong> adalah batasan operasional kritis wajib guna menjamin hilangnya bahaya biologi (mikroba pathogen):</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-center text-slate-700 dark:text-slate-300">
+                            <div class="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-xl">
+                                <span class="font-bold text-red-600 dark:text-red-400">CCP Giling (&lt; 15°C)</span>
+                                <p class="text-[9px] text-slate-500 mt-1">Mencegah kerusakan denaturasi protein miofibril.</p>
+                            </div>
+                            <div class="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-xl">
+                                <span class="font-bold text-red-600 dark:text-red-400">CCP Kukus (Internal &gt; 74°C)</span>
+                                <p class="text-[9px] text-slate-500 mt-1">Mematikan spora bakteri patogen Salmonella secara total.</p>
+                            </div>
+                            <div class="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-xl">
+                                <span class="font-bold text-red-600 dark:text-red-400">CCP Beku (≤ -18°C)</span>
+                                <p class="text-[9px] text-slate-500 mt-1">Menghentikan seluruh metabolisme air mikroba perusak.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                category: "8. Higiene Sanitasi",
+                title: "Sistem Higiene & K3LH Industri",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed">Pekerja industri makanan wajib mematuhi standar Good Manufacturing Practices (GMP):</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-slate-700 dark:text-slate-300">
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900 rounded-lg">🧼 Cuci Tangan</div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900 rounded-lg">🧑‍🍳 Pakai Hairnet</div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900 rounded-lg">🧤 Sarung Tangan</div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900 rounded-lg">🥋 Apron Bersih</div>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-normal">Kontaminasi silang (*cross-contamination*) sering disebabkan oleh tangan kotor yang memegang langsung produk matang setelah menyentuh daging unggas mentah.</p>
+                    </div>
+                `
+            },
+            {
+                category: "9. Pengemasan & Penyimpanan",
+                title: "Teknologi Vacuum Packaging",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed">Nugget komersial dikemas menggunakan plastik nylon kedap udara menggunakan mesin *Vacuum Sealer*:</p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                            <li><strong>Vakum:</strong> Menghilangkan oksigen bebas dari kantong kemasan.</li>
+                            <li><strong>Mencegah Oksidasi Lemak:</strong> Mencegah ketengikan pada lemak jenuh daging ayam.</li>
+                            <li><strong>Menghambat Mikroba Aerob:</strong> Menghalangi respirasi kapang dan bakteri aerob.</li>
+                            <li><strong>Rantai Dingin (Cold Chain):</strong> Wajib disimpan membeku stabil ≤ -18°C guna mempertahankan umur simpan produk hingga 6 bulan.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                category: "10. Pengendalian Mutu",
+                title: "Standar SNI Mutu Chicken Nugget",
+                content: `
+                    <div class="space-y-3 text-xs md:text-sm">
+                        <p class="leading-relaxed">Berdasarkan <strong>SNI 6683:2014</strong>, kriteria kualitas standar mutu chicken nugget ayam meliputi:</p>
+                        <div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300 text-xs">
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 border rounded-lg">🥩 <strong>Kadar Protein:</strong> Minimal 12% berat produk.</div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 border rounded-lg">🥓 <strong>Kadar Lemak:</strong> Maksimal 20%.</div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 border rounded-lg">🧪 <strong>Cemaran Logam:</strong> Bebas serpihan besi (lulus deteksi metal).</div>
+                            <div class="p-2 bg-slate-50 dark:bg-slate-900/50 border rounded-lg">👁️ <strong>Organoleptik:</strong> Bau normal ayam goreng, tidak hancur/pecah.</div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // Database Simulasi Langkah Laboratorium (13 Langkah)
+        const SIMULASI_DATABASE = [
+            { step: 1, title: "1. Persiapan Bahan", desc: "Sortasi daging dada ayam bersih, buang lemak tebal dan serpihan tulang kecil agar emulsi kompak tidak terhalang asam lemak bebas.", icon: "🐔" },
+            { step: 2, title: "2. Penggilingan", desc: "Daging ayam dicincang kasar menggunakan Meat Grinder dengan lubang saringan 4mm guna memperkecil ukuran serat miosin.", icon: "⚙️" },
+            { step: 3, title: "3. Ekstraksi Protein Miofibril", desc: "Gilingan daging dicampur garam dapur (NaCl) dan STPP (fosfat) di dalam Silent Cutter berkecepatan tinggi agar protein pelarut garam miosin terlarut keluar dari sel.", icon: "🧪" },
+            { step: 4, title: "4. Penambahan Es Batu", desc: "Es batu dimasukkan bertahap guna mengontrol temperatur adonan gesekan mesin tetap dingin di bawah 15°C agar protein miosin tidak terdenaturasi.", icon: "🧊" },
+            { step: 5, title: "5. Penambahan Pengikat & Pengisi", desc: "Tepung terigu (binder) dan tepung tapioka (filler) ditambahkan homogen bersama adonan emulsi.", icon: "🌽" },
+            { step: 6, title: "6. Pencetakan Adonan", desc: "Adonan pasta nugget ditaruh rata di dalam cetakan stainless steel steril ber-lapisan minyak nabati.", icon: "🍱" },
+            { step: 7, title: "7. Pengukusan (Steaming)", desc: "Dikukus di dalam ruang uap panas 100°C selama 20-30 menit hingga suhu internal minimal di titik kritis 74°C.", icon: "🌡️" },
+            { step: 8, title: "8. Pendinginan & Pemotongan", desc: "Nugget dikeringkan dingin (setting gel) agar padat lalu dipotong simetris persegi menggunakan pisau tajam stainless steel.", icon: "🔪" },
+            { step: 9, title: "9. Pelapisan Batter (Tepung Basah)", desc: "Potongan nugget dicelup ke larutan kental batter mix (lem perekat pati).", icon: "🥣" },
+            { step: 10, title: "10. Pelapisan Breading (Tepung Roti)", desc: "Nugget basah digulingkan di atas hamparan tepung panir kering kasar secara merata.", icon: "🌾" },
+            { step: 11, title: "11. Pre-frying (Penggorengan Cepat)", desc: "Digoreng cepat di dalam minyak goreng panas 170-180°C selama 30 detik guna mengunci breadcrumb tanpa mematangkan bagian tengah.", icon: "🍟" },
+            { step: 12, title: "12. Pengemasan Vacuum", desc: "Dikemas ke plastik nilon tebal kedap udara menggunakan mesin Vacuum Sealer.", icon: "📦" },
+            { step: 13, title: "13. Pembekuan (Freezer)", desc: "Disimpan membeku stabil di dalam Air Blast Freezer bersuhu target -18°C.", icon: "❄️" }
+        ];
+
+        // Database Kamus Glosarium
+        const GLOSARIUM_DATABASE = [
+            { term: "Emulsifikasi", desc: "Proses penggabungan dua fase cairan yang tidak sejenis (air dan minyak) agar bersatu stabil dibantu penstabil protein." },
+            { term: "Breading", desc: "Proses pelapisan makanan menggunakan tepung roti kering (panir) untuk tekstur garing." },
+            { term: "Batter", desc: "Campuran kental tepung terigu, garam, pati, dan air sebagai lem basah pengikat tepung panir." },
+            { term: "Pre-frying", desc: "Proses penggorengan awal singkat (sekitar 30 detik) pada suhu 170-180°C bertujuan merapatkan ikatan panir luar." },
+            { term: "CCP (Critical Control Point)", desc: "Titik, langkah, atau prosedur pengolahan di mana kendali pengawasan ketat dapat diterapkan guna mencegah potensi bahaya keamanan pangan." },
+            { term: "GMP (Good Manufacturing Practices)", desc: "Pedoman standar operasional cara produksi makanan yang baik, bersih, dan higienis secara industri." },
+            { term: "Sanitasi", desc: "Upaya kebersihan fisik lingkungan, peralatan, serta ruang produksi bebas dari bakteri." },
+            { term: "Higiene", desc: "Upaya kebersihan diri manusia (personal hygiene) guna menghindari cemaran kuman droplet/sentuhan." },
+            { term: "Freezing", desc: "Metode pengawetan produk pangan dengan membekukan kadar air di dalam produk di bawah suhu -18°C." },
+            { term: "Cooking", desc: "Proses pemanasan yang merubah pati mentah larut mengembang memadat menjadi gel matang permanen." }
+        ];
+
+        // Database Latihan Soal Formatif (20 Soal Acak)
+        const LATIHAN_SOAL_DATABASE = [
+            { q: "Apa nama protein larut garam pada daging ayam yang bertindak sebagai pembentuk emulsi utama nugget?", a: "Kolagen", b: "Miosin & Aktin", c: "Kasein", d: "Elastin", correct: "b", desc: "Protein miofibrilar (miosin dan aktin) terlarut keluar dari sel serat daging akibat garam dapur, menjadi pengikat emulsi utama." },
+            { q: "Suhu kritis maksimal gilingan adonan nugget di dalam bowl cutter agar emulsi tidak pecah adalah...", a: "15°C", b: "30°C", c: "50°C", d: "100°C", correct: "a", desc: "Suhu adonan wajib dijaga tetap dingin di bawah 15°C agar protein miofibril tidak mengalami denaturasi prematur akibat panas gesekan mesin." },
+            { q: "Bahan tambahan pangan STPP berfungsi kimiawi untuk...", a: "Meningkatkan daya ikat air (WHC) oleh protein daging", b: "Memutihkan warna nugget", c: "Menambah rasa manis gurih", d: "Membunuh bakteri patogen secara kimiawi", correct: "a", desc: "Sodium Tripolyphosphate (STPP) menggeser pH adonan menjauhi titik isoelektrik sehingga sisa air terkurung erat dalam gel." },
+            { q: "Mengapa es batu ditambahkan langsung saat proses pencincangan daging?", a: "Menambah berat adonan agar murah", b: "Menurunkan panas suhu gilingan mekanis", c: "Mempercepat perebusan", d: "Sebagai pewarna adonan alami", correct: "b", desc: "Es batu mendinginkan panas gesek tinggi dari putaran pisau bowl cutter berkecepatan tinggi." },
+            { q: "Garam dapur murni (NaCl) selain pemberi rasa asin, memiliki peran kimiawi krusial sebagai...", a: "Bahan pengisi pati", b: "Bahan ekstraktor protein larut garam", c: "Zat pewarna buatan", d: "Bahan pelapis luar basah", correct: "b", desc: "Garam melarutkan protein miofibril keluar dari sel otot untuk memicu emulsi kenyal." },
+            { q: "Tepung tapioka berkedudukan sebagai bahan pengisi (filler) karena...", a: "Memiliki kandungan gluten yang tebal", b: "Mengandung pati tinggi penangkap sisa air guna menambah volume kompak", c: "Dapat mewarnai adonan menjadi kuning", d: "Harganya paling mahal", correct: "b", desc: "Tapioka kaya pati pati karbohidrat, bertindak menyerap sisa air hidrasi adonan agar volume nugget padat mantap." },
+            { q: "Kadar protein minimal standar mutu chicken nugget ayam komersial berdasarkan SNI adalah...", a: "5%", b: "12%", c: "20%", d: "50%", correct: "b", desc: "Menurut SNI 6683:2014, kadar protein nugget ayam minimal berada pada angka 12%." },
+            { q: "Peralatan pengolahan daging unggas wajib terbuat dari logam stainless steel bersifat...", a: "Inert, tahan karat, dan mudah dibersihkan", b: "Mudah retak hancur", c: "Memancarkan panas besi", d: "Berwarna emas mengkilap", correct: "a", desc: "Bahan stainless steel mencegah reaksi logam berat dengan sisa garam makanan dan menekan pertumbuhan bakteri di pori-pori alat." },
+            { q: "Kegiatan pelapisan adonan basah (batter) tebal kental berfungsi utama sebagai...", a: "Bahan pengisi adonan utama", b: "Media perekat lem basah agar tepung panir dapat menempel kencang", c: "Bumbu pemanis alami", d: "Bahan pengawet alami", correct: "b", desc: "Battering bertindak sebagai lem adhesi fungsional penahan taburan tepung roti kering." },
+            { q: "Metode penggorengan awal cepat (pre-frying) nugget komersial dilakukan pada suhu...", a: "50-60°C", b: "100-110°C", c: "170-180°C", d: "220-240°C", correct: "c", desc: "Suhu panas tinggi 170-180°C selama 30 detik mengeraskan panir luar garing tanpa mengeringkan bagian dalam." },
+            { q: "Penyimpanan produk beku di cold room secara standar HACCP harus berada pada suhu...", a: "0°C", b: "5°C", c: "≤ -18°C", d: "-50°C", correct: "c", desc: "Suhu beku di bawah -18°C merubah air bebas menjadi kristal es padat total sehingga seluruh kuman terhenti berkembangbiak." },
+            { q: "Bakteri patogen berbahaya utama pembawa kontaminasi dari usus ayam mentah adalah...", a: "Salmonella sp.", b: "Lactobacillus bulgaricus", c: "Saccharomyces cerevisiae", d: "Acetobacter aceti", correct: "a", desc: "Salmonella sp. merupakan bakteri patogen hewani yang memicu diare akut beracun jika tidak dimatikan pada suhu kukus internal &gt;74°C." },
+            { q: "Metode pengemasan hampa udara (vacuum packaging) menggunakan plastik nilon bertujuan...", a: "Mengurangi berat bersih produk", b: "Mencegah reaksi oksidasi lemak ketengikan dan menghambat kuman aerob", c: "Mengembangkan berat nugget", d: "Mematangkan daging ayam dalam plastik", correct: "b", desc: "Penghancuran udara (hampa) menyingkirkan oksigen penyebab ketengikan lemak pangan dan meredam mikroba bernapas aerob." },
+            { q: "Kerusakan produk berupa bercak putih berserat kering mengeras pada permukaan makanan beku diistilahkan...", a: "Denaturasi", b: "Emulsifikasi", c: "Freezer Burn", d: "Gelatinisasi", correct: "c", desc: "Freezer burn terjadi akibat pengemasan bocor yang menyublimkan partikel es di permukaan nugget beku meninggalkan rongga serat kering kasar." },
+            { q: "Pengukusan nugget wajib mencapai batas titik kendali kritis (CCP) berupa suhu bagian dalam...", a: "50°C", b: "60°C", c: "≥ 74°C", d: "100°C", correct: "c", desc: "Suhu internal minimal 74°C menjamin matinya seluruh koloni kuman spora Salmonella." },
+            { q: "Operator yang bersin langsung di atas meja proses melanggar standar...", a: "Higiene personal (Personal Hygiene)", b: "Sanitasi lingkungan", c: "Metode pencampuran", d: "Aspek K3 keselamatan alat", correct: "a", desc: "Bersin menyemburkan droplet bibit penyakit, di mana higiene diri mewajibkan penutupan masker atau cuci tangan darurat." },
+            { q: "Batas maksimal penambahan bahan tambahan STPP fosfat yang diizinkan regulasi BPOM adalah...", a: "0.1%", b: "0.5%", c: "2%", d: "5%", correct: "b", desc: "Regulasi BPOM membatasi sediaan fosfat maksimal 0.5% dari berat daging sapi/ayam demi menghindari rasa kapur pahit dan penyakit ginjal." },
+            { q: "Bahan pengikat (binder) berbeda dengan pengisi. Contoh bahan pengikat kaya gluten adalah...", a: "Tepung tapioka", b: "Tepung terigu", c: "Tepung ketan", d: "Tepung beras", correct: "b", desc: "Kandungan gluten dalam tepung terigu membentuk jalinan protein pengikat adonan basah." },
+            { q: "Pencemaran sisa logam mesin atau pecahan jarum diatasi pabrik menggunakan instrumen...", a: "Saringan tepung", b: "Metal Detector otomatis sebelum karton dikemas", c: "Pisau plastik", d: "Pencucian klorin", correct: "b", desc: "Metal detector dipasang di ujung lini konveyor sebelum produk masuk gudang beku untuk menyingkirkan serpihan besi bahaya fisik." },
+            { q: "Karakteristik organoleptik mutu chicken nugget yang tidak disukai konsumen (rusak) adalah...", a: "Warna kuning keemasan, garing luar", b: "Aroma harum sedap bawang dan daging goreng", c: "Tekstur lembek berair becek (emulsi pecah) atau bau tengik", d: "Tekstur kenyal membal padat", correct: "c", desc: "Lembek berair tanda emulsi rusak pasca pengukusan, dan bau tengik tanda dehidrasi lemak oksidatif." }
+        ];
+
+        // Database Evaluasi Uji Kompetensi Akhir
+        const EVAL_PG_DATABASE = [
+            { q: "Bahan baku pengolahan hewani chicken nugget restrukturisasi yang bertindak menyumbang serat protein myofibril fungsional pelarut garam miosin-aktin adalah...", a: "Lemak ayam cair", b: "Daging dada ayam segar tanpa kulit bebas lemak", c: "Tepung tapioka berkualitas tinggi", d: "Lesitin telur ayam utuh", correct: "b", desc: "Dada ayam tanpa lemak kaya miosin fungsional bebas hambatan asam lemak bebas." },
+            { q: "Mengapa kenaikan suhu adonan bowl cutter melampaui 15°C diklasifikasikan sebagai kegagalan kritis?", a: "Adonan mengembang beragi cepat", b: "Protein miosin terdenaturasi prematur kehilangan kemampuan emulsifikasi", c: "Garam mengendap menjadi kristal kasar berpasir", d: "Ayam mentah matang dingin seketika", correct: "b", desc: "Panas merubah struktur tiga dimensi protein kehilangan kekuatan hidrasi mengikat air bebas." },
+            { q: "Batas ambang parameter standar mutu SNI untuk maksimal kandungan kadar lemak chicken nugget adalah...", a: "5%", b: "10%", c: "20%", d: "30%", correct: "c", desc: "Kadar lemak maksimum dibatasi 20% agar tidak menurunkan kekompakan emulsi." },
+            { q: "Upaya paling mendasar guna mengendalikan bahaya kontaminasi silang mikroba pathogen Salmonella di lini kerja adalah...", a: "Menyemprot meja dengan pewangi parfum", b: "Memisahkan talenan, pisau, dan wadah antara ayam mentah dengan nugget matang", c: "Menggunakan pisau yang tumpul", d: "Mengukus nugget dengan plastik kemasan ditutup kencang", correct: "b", desc: "Pemasangan zona basah mentah dan zona kering matang mencegah perpindahan kuman." },
+            { q: "Viskositas adonan lem tepung basah (batter mix) yang terlalu encer mengakibatkan kerusakan mutu berupa...", a: "Nugget terasa sangat manis gula", b: "Lapisan tepung panir luar mudah rontok terkelupas saat digoreng", c: "Nugget berbau amis lumpur", d: "Tekstur nugget mengeras mengayu", correct: "b", desc: "Viskositas encer menurunkan daya ikat rekat lem basah mengikat remah panir." },
+            { q: "Prinsip dasar teknologi kemasan vacuum sealer nilon food grade pada produk hewani beku adalah...", a: "Menambah berat total kemasan kargo", b: "Mengurangi sisa kadar air adonan", c: "Mengekstrak kuman keluar pori plastik", d: "Menghilangkan oksigen penghambat respirasi kuman aerob & oksidasi lemak tengik", correct: "d", desc: "Hampa udara menekan kerusakan dehidrasi oksidatif selama penyimpanan beku." },
+            { q: "Fase penggorengan awal cepat (pre-frying) industri pangan bertujuan utama untuk...", a: "Mematangkan matang bagian dalam nugget", b: "Mengeraskan gelatinisasi pati panir luar garing dan mengunci warna kuning", c: "Menguapkan seluruh sisa minyak goreng", d: "Menghancurkan tulang rawan ayam", correct: "b", desc: "Pre-frying hanya mematangkan adonan luar pembungkus tepung garing." },
+            { q: "Komposisi penambahan es batu yang ideal pada formulasi emulsi bakso/nugget berkisar...", a: "1-2% berat daging", b: "20-30% berat daging", c: "Sama banyak dengan daging", d: "Tidak ditambahkan sama sekali", correct: "b", desc: "Volume es batu 20-30% menopang hidrasi pati tepung pengisi sekaligus mendinginkan adonan." },
+            { q: "Tindakan kritis operator yang mendeteksi pintu mesin pembeku (Blast Freezer) terbuka longgar adalah...", a: "Dibiarkan saja agar ada sirkulasi udara luar", b: "Segera menutup rapat dan melacak stabilitas suhu digital display tetap ≤ -18°C", c: "Menurunkan tombol sekring pemanas mesin", d: "Menyemprotkan air panas ke dalam mesin", correct: "b", desc: "Pintu terbuka memicu kondensasi uap hangat luar merusak sensor dan memicu fluktuasi beku." },
+            { q: "Standard penimbangan fungsional penambahan BTP pengawet jenis fosfat STPP murni dihitung berdasarkan...", a: "Perkiraan sendok makan takaran bebas", b: "Perhitungan berat bersih daging segar murni (Maksimum 0.5% berat)", c: "Volume air pencampur dingin", d: "Keinginan pemilik modal", correct: "b", desc: "Takaran ketat sediaan wajib ditimbang analitis presisi agar bebas racun." }
+        ];
+
+        const EVAL_BS_DATABASE = [
+            { q: "Penggunaan tepung tapioka pada chicken nugget bertindak sebagai bahan pengisi (filler) penyerap sisa air.", correct: "Benar", desc: "Tapioka kaya karbohidrat pati gelatinisasi bertindak menangkap kelebihan air bebas." },
+            { q: "Suhu air perebusan/pengukusan nugget komersial diatur pada suhu 40°C saja.", correct: "Salah", desc: "Suhu kukus minimal 100°C diperlukan agar terjadi denaturasi protein matang stabil." },
+            { q: "Kemasan plastik vacuum nylon aman digunakan untuk membatasi dehidrasi freezer burn.", correct: "Benar", desc: "Nilon bersifat ulet rapat kedap gas oksigen penahan hidrasi dingin." },
+            { q: "Higiene personal tidak wajib membatasi aksesoris cincin perhiasan tangan saat meremas adonan pangan.", correct: "Salah", desc: "Cincin perhiasan sarang daki dan kuman berbahaya penular kontaminasi." },
+            { q: "Garam dapur murni (NaCl) tidak memiliki kontribusi kimiawi bagi kelarutan serabut otot miosin.", correct: "Salah", desc: "Garam dapur adalah zat aktif ekstraktor utama protein myofibril pelarut garam." }
+        ];
+    </script>
+
+    <script>
+        // Inisialisasi Audio Context Prosedural Tanpa Internet
+        function initAudioCtx() {
+            if (!appState.audioCtx) {
+                appState.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (appState.audioCtx.state === 'suspended') {
+                appState.audioCtx.resume();
+            }
+        }
+
+        function playSound(freq, duration, type = "sine", slide = 0) {
+            if (appState.audioMuted) return;
+            try {
+                initAudioCtx();
+                const osc = appState.audioCtx.createOscillator();
+                const gain = appState.audioCtx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, appState.audioCtx.currentTime);
+                if (slide > 0) {
+                    osc.frequency.exponentialRampToValueAtTime(slide, appState.audioCtx.currentTime + duration);
+                }
+
+                gain.gain.setValueAtTime(0.08, appState.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, appState.audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(appState.audioCtx.destination);
+
+                osc.start();
+                osc.stop(appState.audioCtx.currentTime + duration);
+            } catch (e) {
+                console.warn("Audio synthesis error: ", e);
+            }
+        }
+
+        function playCorrectSound() {
+            playSound(523.25, 0.1); // C5
+            setTimeout(() => {
+                playSound(659.25, 0.15); // E5
+            }, 80);
+        }
+
+        function playWrongSound() {
+            playSound(180, 0.3, "sawtooth", 80);
+        }
+
+        function playClickSound() {
+            playSound(440, 0.05, "triangle");
+        }
+
+        function toggleAudioSystem() {
+            appState.audioMuted = !appState.audioMuted;
+            const icon = document.getElementById('audio-icon');
+            const btn = document.getElementById('audio-toggle-btn');
+            
+            initAudioCtx();
+            if (appState.audioMuted) {
+                icon.className = "fa-solid fa-volume-xmark text-sm";
+                btn.className = "p-2 bg-brandBlue-800 hover:bg-brandBlue-700 rounded-full transition w-9 h-9 flex items-center justify-center border border-brandBlue-700 shadow";
+            } else {
+                icon.className = "fa-solid fa-volume-high text-sm";
+                btn.className = "p-2 bg-brandOrange-500 hover:bg-brandOrange-600 text-white rounded-full transition w-9 h-9 flex items-center justify-center shadow-md animate-pulse";
+                playCorrectSound();
+            }
+        }
+    </script>
+
+    <script>
+        // State management local storage on load
+        window.onload = function() {
+            // Load progress
+            const savedProgress = localStorage.getItem('smk_nugget_progress');
+            if (savedProgress) {
+                appState.learningProgress = JSON.parse(savedProgress);
+            }
+            updateProgressBar();
+
+            // Load mode
+            const savedTheme = localStorage.getItem('smk_nugget_theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            // Start study timer
+            appState.timerInterval = setInterval(() => {
+                appState.elapsedSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+
+            showScreen('screen-home');
+            initGlosarium();
+        };
+
+        function showScreen(screenId) {
+            playClickSound();
+            
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen-view');
+            screens.forEach(s => s.classList.add('hidden'));
+
+            // Show target
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('fade-in');
+            }
+
+            appState.activeScreen = screenId;
+
+            // Sync breadcrumbs widget
+            const breadWidget = document.getElementById('breadcrumb-widget');
+            const breadLbl = document.getElementById('bread-current-sec');
+            
+            if (screenId === 'screen-home') {
+                breadWidget.classList.add('hidden');
+            } else {
+                breadWidget.classList.remove('hidden');
+                let name = "Menu Utama";
+                if (screenId === 'screen-materi') name = "Slide Materi";
+                if (screenId === 'screen-simulasi') name = "Simulasi Lab";
+                if (screenId === 'screen-games') name = "Game Edukasi";
+                if (screenId === 'screen-latihan') name = "Latihan Soal";
+                if (screenId === 'screen-evaluasi') name = "Uji Evaluasi";
+                if (screenId === 'screen-capaian') name = "Capaian CP";
+                if (screenId === 'screen-tujuan') name = "Tujuan Belajar";
+                if (screenId === 'screen-petunjuk') name = "Petunjuk";
+                if (screenId === 'screen-glosarium') name = "Glosarium";
+                if (screenId === 'screen-profil') name = "Profil Guru";
+                breadLbl.innerText = name;
+            }
+
+            // Specific screen initializers
+            if (screenId === 'screen-materi') {
+                appState.activeMateriSlide = 0;
+                renderMateriSlide();
+            }
+            if (screenId === 'screen-simulasi') {
+                appState.activeSimStep = 1;
+                renderSimStep();
+            }
+            if (screenId === 'screen-games') {
+                selectGameTab(appState.activeGameTab);
+            }
+            if (screenId === 'screen-latihan') {
+                initLatihanSession();
+            }
+            if (screenId === 'screen-evaluasi') {
+                initEvalSession();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const h = Math.floor(appState.elapsedSeconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((appState.elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (appState.elapsedSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('study-timer-lbl').innerText = `${h}:${m}:${s}`;
+        }
+
+        function updateProgressBar() {
+            // Hitung persentase keterbacaan materi & game
+            const totalItems = MATERI_DATABASE.length + 7; // 10 slide materi + 7 game
+            let finishedCount = 0;
+
+            for (let i = 0; i < MATERI_DATABASE.length; i++) {
+                if (appState.learningProgress[`materi_slide_${i}`]) finishedCount++;
+            }
+            const gameIds = ['g_bahan', 'g_alur', 'g_alat', 'g_gmp', 'g_memory', 'g_wheel', 'g_bs'];
+            gameIds.forEach(id => {
+                if (appState.learningProgress[id]) finishedCount++;
+            });
+
+            const percentage = Math.round((finishedCount / totalItems) * 100);
+            document.getElementById('progress-percentage-lbl').innerText = `${percentage}%`;
+            document.getElementById('progress-indicator-bar').style.width = `${percentage}%`;
+        }
+
+        function markProgress(id) {
+            appState.learningProgress[id] = true;
+            localStorage.setItem('smk_nugget_progress', JSON.stringify(appState.learningProgress));
+            updateProgressBar();
+        }
+
+        function toggleDarkMode() {
+            playClickSound();
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('smk_nugget_theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('smk_nugget_theme', 'dark');
+            }
+        }
+
+        // Custom modal alerts system
+        function showCustomMsg(title, text, type = "info") {
+            const wrapper = document.getElementById('msg-icon-wrapper');
+            const icon = document.getElementById('msg-icon');
+            const box = document.getElementById('msg-modal');
+
+            document.getElementById('msg-title').innerText = title;
+            document.getElementById('msg-body').innerText = text;
+
+            if (type === "success") {
+                wrapper.className = "inline-flex p-3 rounded-full text-4xl bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 animate-bounce";
+                icon.className = "fa-solid fa-circle-check";
+            } else if (type === "error") {
+                wrapper.className = "inline-flex p-3 rounded-full text-4xl bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-300";
+                icon.className = "fa-solid fa-triangle-exclamation";
+            } else if (type === "warning") {
+                wrapper.className = "inline-flex p-3 rounded-full text-4xl bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300";
+                icon.className = "fa-solid fa-circle-exclamation";
+            } else {
+                wrapper.className = "inline-flex p-3 rounded-full text-4xl bg-brandBlue-100 text-brandBlue-600 dark:bg-brandBlue-950/40 dark:text-brandBlue-300";
+                icon.className = "fa-solid fa-circle-info";
+            }
+
+            box.classList.remove('hidden');
+        }
+
+        function closeMsgModal() {
+            document.getElementById('msg-modal').classList.add('hidden');
+        }
+    </script>
+
+    <script>
+        function renderMateriSlide() {
+            const slide = MATERI_DATABASE[appState.activeMateriSlide];
+            document.getElementById('materi-category-lbl').innerText = slide.category;
+            document.getElementById('materi-title-lbl').innerText = slide.title;
+            
+            const container = document.getElementById('materi-slide-container');
+            container.innerHTML = `<div class="animate-fade-in">${slide.content}</div>`;
+
+            // Update footer info
+            document.getElementById('materi-index-lbl').innerText = `Slide ${appState.activeMateriSlide + 1} / ${MATERI_DATABASE.length}`;
+
+            // Handle button states
+            document.getElementById('materi-prev-btn').disabled = (appState.activeMateriSlide === 0);
+            
+            const nextBtn = document.getElementById('materi-next-btn');
+            if (appState.activeMateriSlide === MATERI_DATABASE.length - 1) {
+                nextBtn.innerHTML = `<span>Selesaikan Modul</span> <i class="fa-solid fa-circle-check"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>Lanjut</span> <i class="fa-solid fa-chevron-right"></i>`;
+            }
+
+            // Simpan progres keterbacaan slide ini
+            markProgress(`materi_slide_${appState.activeMateriSlide}`);
+        }
+
+        function nextMateriSlide() {
+            playClickSound();
+            if (appState.activeMateriSlide < MATERI_DATABASE.length - 1) {
+                appState.activeMateriSlide++;
+                renderMateriSlide();
+            } else {
+                // Selesai modul materi
+                playCorrectSound();
+                showCustomMsg("Modul Selesai!", "Bagus sekali! Anda telah membaca seluruh slide keilmuan pembuatan chicken nugget. Mari uji pengetahuan Anda di menu kuis atau simulasi!", "success");
+                showScreen('screen-menu');
+            }
+        }
+
+        function prevMateriSlide() {
+            playClickSound();
+            if (appState.activeMateriSlide > 0) {
+                appState.activeMateriSlide--;
+                renderMateriSlide();
+            }
+        }
+    </script>
+
+    <script>
+        function renderSimStep() {
+            const stepData = SIMULASI_DATABASE[appState.activeSimStep - 1];
+            const panel = document.getElementById('sim-dynamic-panel');
+            
+            panel.innerHTML = `
+                <div class="space-y-4 animate-fade-in text-slate-800 dark:text-slate-100">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-4xl bg-brandOrange-100 dark:bg-brandOrange-950 p-2.5 rounded-2xl shrink-0">${stepData.icon}</span>
+                        <div>
+                            <h4 class="brand-text text-base md:text-lg font-bold text-brandBlue-950 dark:text-white">${stepData.title}</h4>
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">Langkah Berurutan Lab</p>
+                        </div>
+                    </div>
+                    <p class="text-xs md:text-sm leading-relaxed text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 p-4 border rounded-2xl shadow-inner">${stepData.desc}</p>
+                </div>
+            `;
+
+            // Indikator teks & button states
+            document.getElementById('sim-step-indicator').innerText = `Langkah ${appState.activeSimStep} / ${SIMULASI_DATABASE.length}`;
+            document.getElementById('sim-prev-btn').disabled = (appState.activeSimStep === 1);
+
+            const nextBtn = document.getElementById('sim-next-btn');
+            if (appState.activeSimStep === 1) {
+                nextBtn.innerHTML = `<span>Mulai Proses</span>`;
+            } else if (appState.activeSimStep === SIMULASI_DATABASE.length) {
+                nextBtn.innerHTML = `<span>Selesaikan Simulasi</span> <i class="fa-solid fa-circle-check"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>Lanjut Langkah</span> <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        }
+
+        function nextSimStep() {
+            playClickSound();
+            if (appState.activeSimStep < SIMULASI_DATABASE.length) {
+                appState.activeSimStep++;
+                renderSimStep();
+            } else {
+                // Selesai seluruh simulasi langkah
+                playCorrectSound();
+                showCustomMsg("Eksperimen Lab Selesai!", "Selamat! Anda telah melakukan pengamatan visual simulasi alur kerja pembuatan nugget dari persiapan hingga beku.", "success");
+                showScreen('screen-menu');
+            }
+        }
+
+        function prevSimStep() {
+            playClickSound();
+            if (appState.activeSimStep > 1) {
+                appState.activeSimStep--;
+                renderSimStep();
+            }
+        }
+    </script>
+
+    <script>
+        function initGlosarium() {
+            renderGlosariumList(GLOSARIUM_DATABASE);
+        }
+
+        function renderGlosariumList(data) {
+            const container = document.getElementById('glosarium-list');
+            container.innerHTML = "";
+
+            if (data.length === 0) {
+                container.innerHTML = `<div class="text-slate-400 text-xs italic text-center py-6 col-span-2">Tidak ditemukan hasil pencarian istilah...</div>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl space-y-1";
+                card.innerHTML = `
+                    <h5 class="font-extrabold text-xs text-brandBlue-900 dark:text-brandBlue-200 uppercase">${item.term}</h5>
+                    <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-normal">${item.desc}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterGlosarium(query) {
+            const filtered = GLOSARIUM_DATABASE.filter(item => 
+                item.term.toLowerCase().includes(query.toLowerCase()) || 
+                item.desc.toLowerCase().includes(query.toLowerCase())
+            );
+            renderGlosariumList(filtered);
+        }
+
+        function selectGameTab(tabId) {
+            playClickSound();
+            appState.activeGameTab = tabId;
+
+            // Sync Tab bar styles
+            const buttons = document.querySelectorAll('#games-tab-bar button');
+            buttons.forEach(btn => {
+                btn.className = "px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition";
+            });
+
+            const activeBtn = document.getElementById(`gtab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "px-3.5 py-1.5 bg-brandOrange-500 text-white rounded-lg text-xs font-bold transition shadow-md";
+            }
+
+            // Load Game Workspaces
+            const workspace = document.getElementById('game-workspace');
+            workspace.innerHTML = ""; // clean
+
+            if (tabId === 'bahan') renderGameBahan(workspace);
+            if (tabId === 'alur') renderGameAlur(workspace);
+            if (tabId === 'alat') renderGameAlat(workspace);
+            if (tabId === 'gmp') renderGameGMP(workspace);
+            if (tabId === 'memory') renderGameMemory(workspace);
+            if (tabId === 'wheel') renderGameWheel(workspace);
+            if (tabId === 'bs') renderGameBS(workspace);
+        }
+    </script>
+
+    <script>
+        // Database Bahan Game A
+        const GAME_BAHAN_DB = [
+            { id: "daging", name: "Daging Dada Ayam", type: " Utama", correct: true, desc: "Bahan murni penyumbang protein myofibril pembentuk emulsi gel." },
+            { id: "terigu", name: "Tepung Terigu", type: " Pengikat", correct: true, desc: "Kandungan protein gluten mengikat serat adonan matang." },
+            { id: "tapioka", name: "Tepung Tapioka", type: " Pengisi", correct: true, desc: "Menyerap sisa cairan hidrasi bebas meluaskan volume." },
+            { id: "es", name: "Es Batu Hancur", type: " Pengontrol", correct: true, desc: "Meredam suhu gilingan tetap &lt; 15°C terhindar denaturasi." },
+            { id: "stpp", name: "STPP Fosfat", type: " BTP", correct: true, desc: "Merenggangkan protein aktin-miosin memperbesar WHC ikat air." },
+            { id: "kopi", name: "Kopi Bubuk", type: " Salah", correct: false, desc: "Kafein pahit merusak total organoleptik alami nugget." },
+            { id: "sirup", name: "Sirup Gula Buah", type: " Salah", correct: false, desc: "Manis berlebih merusak warna gosong cepat saat pre-frying." }
+        ];
+
+        let gameBahanSelected = [];
+
+        function renderGameBahan(container) {
+            gameBahanSelected = [];
+            container.innerHTML = `
+                <div class="space-y-4 text-slate-800 dark:text-slate-100">
+                    <div class="text-center md:text-left">
+                        <h4 class="brand-text text-sm md:text-base font-bold text-brandBlue-900 dark:text-white">Tantangan A: Formulasi Bahan Baku</h4>
+                        <p class="text-[11px] text-slate-500">Pilihlah bahan-bahan yang mutlak wajib digunakan pada resep standar pembuatan chicken nugget unggul komersial!</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5" id="game-bahan-grid"></div>
+
+                    <div class="flex justify-end pt-2 border-t dark:border-slate-700">
+                        <button onclick="verifyGameBahan()" class="px-5 py-2 bg-brandBlue-900 hover:bg-brandBlue-800 text-white font-bold rounded-xl text-xs transition">Verifikasi Formula Bahan</button>
+                    </div>
+                </div>
+            `;
+
+            const grid = document.getElementById('game-bahan-grid');
+            const shuffled = [...GAME_BAHAN_DB].sort(() => 0.5 - Math.random());
+            shuffled.forEach(item => {
+                const card = document.createElement('button');
+                card.id = `gb-card-${item.id}`;
+                card.onclick = () => selectGameBahan(item.id);
+                card.className = "p-3 bg-white dark:bg-slate-800 border dark:border-slate-700 text-left rounded-2xl transition hover:bg-slate-50 shadow-sm flex justify-between items-center h-16";
+                card.innerHTML = `
+                    <div>
+                        <span class="text-[9px] uppercase font-bold text-brandBlue-500">${item.type}</span>
+                        <h5 class="font-bold text-xs mt-0.5 leading-tight">${item.name}</h5>
+                    </div>
+                    <span id="gb-check-${item.id}" class="text-slate-300"><i class="fa-regular fa-circle-dot"></i></span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function selectGameBahan(id) {
+            playSound(450, 0.05);
+            const card = document.getElementById(`gb-card-${id}`);
+            const check = document.getElementById(`gb-check-${id}`);
+            const idx = gameBahanSelected.indexOf(id);
+
+            if (idx > -1) {
+                gameBahanSelected.splice(idx, 1);
+                card.classList.remove('border-2', 'border-brandOrange-500', 'bg-brandOrange-50/40');
+                check.className = "text-slate-300";
+                check.innerHTML = `<i class="fa-regular fa-circle-dot"></i>`;
+            } else {
+                gameBahanSelected.push(id);
+                card.classList.add('border-2', 'border-brandOrange-500', 'bg-brandOrange-50/40');
+                check.className = "text-brandOrange-500";
+                check.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+            }
+        }
+
+        function verifyGameBahan() {
+            if (gameBahanSelected.length === 0) {
+                showCustomMsg("Bahan Kosong", "Pilihlah minimal satu bahan terlebih dahulu!", "warning");
+                return;
+            }
+
+            const correctList = GAME_BAHAN_DB.filter(x => x.correct).map(x => x.id);
+            const userCorrect = gameBahanSelected.filter(id => correctList.includes(id));
+            const userWrong = gameBahanSelected.filter(id => !correctList.includes(id));
+
+            if (userCorrect.length === correctList.length && userWrong.length === 0) {
+                playCorrectSound();
+                markProgress('g_bahan');
+                showCustomMsg("Formula Sempurna!", "Hebat! Anda berhasil menyusun formulasi adonan hewani chicken nugget standar mutu pangan.", "success");
+            } else {
+                playWrongSound();
+                showCustomMsg("Formula Rusak", "Masih keliru! Beberapa bahan pengganggu masuk ke adonan atau bahan kritis miosin terlewatkan. Coba susun kembali formulasi Anda!", "error");
+                selectGameTab('bahan'); // reset
+            }
+        }
+
+        // Game B: Sorter Alur
+        const GAME_ALUR_SEQUENCE = [
+            "Giling Daging", "Cutter Emulsi", "Steaming Gel", "Pelapisan Panir", "Pre-frying", "Vacuum Sealer"
+        ];
+        let gameAlurSelected = [];
+
+        function renderGameAlur(container) {
+            gameAlurSelected = [];
+            container.innerHTML = `
+                <div class="space-y-4 text-slate-800 dark:text-slate-100">
+                    <div class="text-center md:text-left">
+                        <h4 class="brand-text text-sm md:text-base font-bold text-brandBlue-900 dark:text-white">Tantangan B: Urutan Alur Proses Pembuatan</h4>
+                        <p class="text-[11px] text-slate-500">Klik berurutan (dari 1 sampai 6) tahapan kritis proses dari bahan baku menjadi nugget siap kemas!</p>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-4 h-[180px]">
+                        <div class="w-full lg:w-1/2 flex flex-col justify-between">
+                            <span class="text-[10px] font-bold text-slate-400 block mb-1">Pilihan Langkah Acak:</span>
+                            <div class="grid grid-cols-2 gap-2 overflow-y-auto max-h-[140px] border p-2 bg-white dark:bg-slate-800 rounded-xl" id="ga-scrambled"></div>
+                        </div>
+                        <div class="w-full lg:w-1/2 flex flex-col justify-between">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-brandBlue-900 block">Alur Proses Susunan Anda:</span>
+                                <button onclick="selectGameTab('alur')" class="text-[9px] text-red-500 font-bold uppercase">Reset</button>
+                            </div>
+                            <div class="flex-grow flex flex-col space-y-1 overflow-y-auto max-h-[130px] border p-2 bg-indigo-50/50 dark:bg-slate-900/30 rounded-xl justify-center text-center" id="ga-target">
+                                <span class="text-xs text-slate-400 italic">Belum ada langkah dipilih.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2 border-t dark:border-slate-700">
+                        <button onclick="verifyGameAlur()" class="px-5 py-2 bg-brandBlue-900 hover:bg-brandBlue-800 text-white font-bold rounded-xl text-xs transition">Verifikasi Urutan Proses</button>
+                    </div>
+                </div>
+            `;
+
+            const scrambled = document.getElementById('ga-scrambled');
+            const shuffled = [...GAME_ALUR_SEQUENCE].sort(() => 0.5 - Math.random());
+            shuffled.forEach((step, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `ga-btn-${idx}`;
+                btn.onclick = () => selectGameAlurStep(step, btn);
+                btn.className = "p-2 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 text-[10px] text-left rounded-lg border dark:border-slate-600 font-bold truncate";
+                btn.innerText = step;
+                scrambled.appendChild(btn);
+            });
+        }
+
+        function selectGameAlurStep(step, btnEl) {
+            playSound(400, 0.05);
+            btnEl.disabled = true;
+            btnEl.classList.add('opacity-40', 'pointer-events-none');
+
+            gameAlurSelected.push(step);
+
+            const target = document.getElementById('ga-target');
+            target.innerHTML = "";
+
+            gameAlurSelected.forEach((s, idx) => {
+                const item = document.createElement('div');
+                item.className = "flex items-center space-x-2 bg-white dark:bg-slate-800 p-1.5 border dark:border-slate-700 rounded-lg text-[10px] font-extrabold shadow-sm";
+                item.innerHTML = `<span class="bg-brandBlue-900 text-amber-400 w-4 h-4 rounded-full flex items-center justify-center text-[9px]">${idx + 1}</span><span>${s}</span>`;
+                target.appendChild(item);
+            });
+            target.scrollTop = target.scrollHeight;
+        }
+
+        function verifyGameAlur() {
+            if (gameAlurSelected.length < GAME_ALUR_SEQUENCE.length) {
+                showCustomMsg("Langkah Belum Lengkap", "Harap pilih seluruh 6 tahapan secara berurutan!", "warning");
+                return;
+            }
+
+            let correct = true;
+            for (let i = 0; i < GAME_ALUR_SEQUENCE.length; i++) {
+                if (gameAlurSelected[i] !== GAME_ALUR_SEQUENCE[i]) {
+                    correct = false;
+                    break;
+                }
+            }
+
+            if (correct) {
+                playCorrectSound();
+                markProgress('g_alur');
+                showCustomMsg("Urutan Alur Hebat!", "Luar biasa! Urutan alur diagram produksi Anda sudah presisi dan aman dari kontaminasi silang.", "success");
+            } else {
+                playWrongSound();
+                showCustomMsg("Alur Terbalik", "Terbalik! Proses pengukusan adonan miosin harus matang kokoh sebelum dipotong pelapisan panir. Silakan coba kembali!", "error");
+                selectGameTab('alur');
+            }
+        }
+    </script>
+
+    <script>
+        const GAME_ALAT_MATCH = [
+            { id: "g1", name: "Meat Grinder", func: "Memperkecil serat otot daging ayam kasar." },
+            { id: "g2", name: "Silent Cutter", func: "Mencampur adonan emulsi berkecepatan tinggi." },
+            { id: "g3", name: "Vacuum Sealer", func: "Menghampakan udara plastik kemasan nilon kedap." },
+            { id: "g4", name: "ABF Freezer", func: "Membekukan cepat total kristal es target suhu ≤ -18°C." }
+        ];
+
+        let gameAlatSelection = { mach: null, func: null, matched: {} };
+
+        function renderGameAlat(container) {
+            gameAlatSelection = { mach: null, func: null, matched: {} };
+            container.innerHTML = `
+                <div class="space-y-4 text-slate-800 dark:text-slate-100">
+                    <div class="text-center md:text-left">
+                        <h4 class="brand-text text-sm md:text-base font-bold text-brandBlue-900 dark:text-white">Tantangan C: Hubungkan Alat & Fungsi Mekanis</h4>
+                        <p class="text-[11px] text-slate-500">Pilih salah satu Alat di sebelah kiri, kemudian pilih Deskripsi Fungsi yang cocok di sebelah kanan!</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 h-[180px] overflow-y-auto pr-2 custom-scroll">
+                        <div class="space-y-2" id="g-mach-col"></div>
+                        <div class="space-y-2" id="g-func-col"></div>
+                    </div>
+                </div>
+            `;
+
+            const machCol = document.getElementById('g-mach-col');
+            const funcCol = document.getElementById('g-func-col');
+
+            const shufMach = [...GAME_ALAT_MATCH].sort(() => 0.5 - Math.random());
+            const shufFunc = [...GAME_ALAT_MATCH].sort(() => 0.5 - Math.random());
+
+            shufMach.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `g-mach-${item.id}`;
+                btn.onclick = () => selectGameAlatItem(item.id, 'mach');
+                btn.className = "w-full p-2.5 bg-white dark:bg-slate-800 border dark:border-slate-700 hover:bg-slate-50 text-left text-[11px] font-bold rounded-xl transition shadow-sm flex items-center justify-between";
+                btn.innerHTML = `<span>⚙️ ${item.name}</span> <span id="gm-icon-${item.id}"><i class="fa-regular fa-circle"></i></span>`;
+                machCol.appendChild(btn);
+            });
+
+            shufFunc.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `g-func-${item.id}`;
+                btn.onclick = () => selectGameAlatItem(item.id, 'func');
+                btn.className = "w-full p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 hover:bg-slate-50 text-left text-[10px] font-medium rounded-xl transition shadow-sm leading-tight h-[42px] flex items-center justify-between";
+                btn.innerHTML = `<span class="line-clamp-2">${item.func}</span> <span id="gf-icon-${item.id}"><i class="fa-regular fa-circle"></i></span>`;
+                funcCol.appendChild(btn);
+            });
+        }
+
+        function selectGameAlatItem(id, type) {
+            playSound(450, 0.05);
+            if (gameAlatSelection.matched[id]) return;
+
+            if (type === 'mach') {
+                if (gameAlatSelection.mach) {
+                    document.getElementById(`g-mach-${gameAlatSelection.mach}`).classList.remove('border-brandOrange-500', 'bg-brandOrange-50/20');
+                }
+                gameAlatSelection.mach = id;
+                document.getElementById(`g-mach-${id}`).classList.add('border-brandOrange-500', 'bg-brandOrange-50/20');
+            } else {
+                if (gameAlatSelection.func) {
+                    document.getElementById(`g-func-${gameAlatSelection.func}`).classList.remove('border-brandOrange-500', 'bg-brandOrange-50/20');
+                }
+                gameAlatSelection.func = id;
+                document.getElementById(`g-func-${id}`).classList.add('border-brandOrange-500', 'bg-brandOrange-50/20');
+            }
+
+            if (gameAlatSelection.mach && gameAlatSelection.func) {
+                if (gameAlatSelection.mach === gameAlatSelection.func) {
+                    playCorrectSound();
+                    const matchedId = gameAlatSelection.mach;
+                    gameAlatSelection.matched[matchedId] = true;
+
+                    const bM = document.getElementById(`g-mach-${matchedId}`);
+                    const bF = document.getElementById(`g-func-${matchedId}`);
+
+                    bM.className = "w-full p-2.5 bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-500 text-left text-[11px] font-extrabold text-emerald-800 dark:text-emerald-300 rounded-xl transition pointer-events-none flex items-center justify-between";
+                    document.getElementById(`gm-icon-${matchedId}`).innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+
+                    bF.className = "w-full p-2 bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-500 text-left text-[10px] font-bold text-emerald-800 dark:text-emerald-300 rounded-xl transition h-[42px] pointer-events-none flex items-center justify-between";
+                    document.getElementById(`gf-icon-${matchedId}`).innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+
+                    if (Object.keys(gameAlatSelection.matched).length === GAME_ALAT_MATCH.length) {
+                        markProgress('g_alat');
+                        showCustomMsg("Pencocokan Sukses!", "Luar biasa! Anda memahami seluruh asas fungsional alat produksi daging.", "success");
+                    }
+                } else {
+                    playWrongSound();
+                    const wrongM = document.getElementById(`g-mach-${gameAlatSelection.mach}`);
+                    const wrongF = document.getElementById(`g-func-${gameAlatSelection.func}`);
+
+                    wrongM.classList.add('animate-shake', 'border-red-500', 'bg-red-50');
+                    wrongF.classList.add('animate-shake', 'border-red-500', 'bg-red-50');
+
+                    setTimeout(() => {
+                        wrongM.className = "w-full p-2.5 bg-white dark:bg-slate-800 border dark:border-slate-700 hover:bg-slate-50 text-left text-[11px] font-bold rounded-xl transition shadow-sm flex items-center justify-between";
+                        wrongF.className = "w-full p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 hover:bg-slate-50 text-left text-[10px] font-medium rounded-xl transition shadow-sm leading-tight h-[42px] flex items-center justify-between";
+                        document.getElementById(`gm-icon-${gameAlatSelection.mach}`).innerHTML = `<i class="fa-regular fa-circle"></i>`;
+                        document.getElementById(`gf-icon-${gameAlatSelection.func}`).innerHTML = `<i class="fa-regular fa-circle"></i>`;
+                    }, 500);
+                }
+
+                gameAlatSelection.mach = null;
+                gameAlatSelection.func = null;
+            }
+        }
+
+        // Game D: Detektif Sanitasi K3LH & GMP (Expanded to 8 Errors)
+        const GAME_GMP_FAILURES = [
+            { id: "hairnet", name: "Operator Tanpa Hairnet", desc: "Rambut operator rentan jatuh memicu kontaminasi fisik adonan.", type: "K3LH" },
+            { id: "gloves", name: "Tanpa Sarung Tangan", desc: "Permukaan tangan menyimpan koloni bakteri Staphylococcus aureus.", type: "GMP" },
+            { id: "trash", name: "Sampah Terbuka", desc: "Mengundang vektor lalat pembawa bakteri Escherichia coli.", type: "Sanitasi" },
+            { id: "knife", name: "Pisau Berkarat & Kotor", desc: "Serpihan karat logam memicu bahaya fisik-kimiawi toksik.", type: "Higiene" },
+            { id: "floor", name: "Daging di Lantai", desc: "Lantai kotor merupakan sarang kontaminasi mikroba patogen.", type: "SOP" },
+            { id: "mixed", name: "Daging Mentah & Nugget Matang Bercampur", desc: "Memicu terjadinya kontaminasi silang (cross-contamination).", type: "HACCP" },
+            { id: "unwashed", name: "Bersin Tanpa Cuci Tangan", desc: "Droplet bersin menyemburkan bakteri patogen ke zona bersih.", type: "Higiene" },
+            { id: "freezer", name: "Pintu Freezer Terbuka", desc: "Merusak stabilitas rantai dingin pengawetan suhu ≤ -18°C.", type: "HACCP" }
+        ];
+
+        let gameGmpFound = [];
+
+        function renderGameGMP(container) {
+            gameGmpFound = [];
+            container.innerHTML = `
+                <div class="space-y-4 text-slate-800 dark:text-slate-100">
+                    <div class="text-center md:text-left">
+                        <h4 class="brand-text text-sm md:text-base font-bold text-brandBlue-900 dark:text-white">Tantangan D: Detektif Sanitasi K3LH & GMP</h4>
+                        <p class="text-[11px] text-slate-500">Amati laboratorium pengolahan di bawah, temukan 8 penyimpangan kritis sanitasi dengan menyentuh area hotspot merah berkedip!</p>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <!-- SVG Interactive Canvas Map -->
+                        <div class="w-full lg:w-2/3 bg-slate-900 rounded-2xl p-1 relative border-4 border-slate-700" style="height: 220px;">
+                            <svg viewBox="0 0 100 100" class="w-full h-full">
+                                <rect x="0" y="0" width="100" height="100" fill="#1e293b"/>
+                                <!-- Walls / Meja / Sink -->
+                                <line x1="0" y1="40" x2="100" y2="40" stroke="#475569" stroke-width="2"/>
+                                <rect x="15" y="48" width="55" height="15" fill="#334155" rx="3"/>
+                                
+                                <!-- Operator siluet & Sink -->
+                                <circle cx="28" cy="35" r="4" fill="#f8fafc" stroke="#0284c7"/>
+                                <rect x="5" y="15" width="8" height="15" fill="#475569" rx="1"/>
+                                
+                                <!-- 8 Hotspots Clicking Area -->
+                                <circle id="gmp-spot-hairnet" cx="28" cy="30" r="3.5" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('hairnet')"/>
+                                <circle id="gmp-spot-gloves" cx="26" cy="42" r="3.5" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('gloves')"/>
+                                <rect id="gmp-spot-trash" x="84" y="70" width="10" height="15" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('trash')"/>
+                                <rect id="gmp-spot-knife" x="48" y="46" width="6" height="4" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('knife')"/>
+                                <circle id="gmp-spot-floor" cx="22" cy="85" r="4" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('floor')"/>
+                                <circle id="gmp-spot-mixed" cx="62" cy="49" r="4" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('mixed')"/>
+                                <circle id="gmp-spot-unwashed" cx="45" cy="18" r="3.5" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('unwashed')"/>
+                                <rect id="gmp-spot-freezer" x="74" y="10" width="14" height="25" fill="#ef4444" opacity="0.65" class="animate-pulse cursor-pointer" onclick="fixGmpViolation('freezer')"/>
+                            </svg>
+                        </div>
+
+                        <div class="w-full lg:w-1/3 p-3 bg-white dark:bg-slate-800 border rounded-2xl" style="height: 220px;">
+                            <span class="text-[10px] font-bold text-slate-400 block border-b pb-1">Buku Catatan Auditor (Temuan: <strong id="gmp-found-lbl">0/8</strong>):</span>
+                            <div class="text-[10px] text-slate-500 mt-2 space-y-1 overflow-y-auto max-h-[160px] custom-scroll" id="gmp-audit-log">
+                                <p class="text-orange-600 font-semibold">Cari dan sentuh 8 hotspot berkedip merah!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function fixGmpViolation(id) {
+            if (gameGmpFound.includes(id)) return;
+            playCorrectSound();
+            gameGmpFound.push(id);
+
+            const vData = GAME_GMP_FAILURES.find(x => x.id === id);
+
+            const spotId = (id === 'trash' || id === 'knife' || id === 'freezer') ? `gmp-spot-${id}` : `gmp-spot-${id}`;
+            const spotEl = document.getElementById(spotId);
+            if (spotEl) {
+                spotEl.setAttribute('fill', '#22c55e');
+                spotEl.classList.remove('animate-pulse');
+            }
+
+            document.getElementById('gmp-found-lbl').innerText = `${gameGmpFound.length}/8`;
+
+            const log = document.getElementById('gmp-audit-log');
+            if (gameGmpFound.length === 1) log.innerHTML = ""; // clean initial tip
+
+            const item = document.createElement('div');
+            item.className = "p-1.5 bg-green-50 dark:bg-green-950/20 border border-green-200 text-green-800 dark:text-green-300 rounded-lg animate-fade-in mb-1";
+            item.innerHTML = `<strong>✔ FIXED [${vData.type}]: ${vData.name}</strong><p class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">${vData.desc}</p>`;
+            log.appendChild(item);
+            log.scrollTop = log.scrollHeight;
+
+            if (gameGmpFound.length === GAME_GMP_FAILURES.length) {
+                markProgress('g_gmp');
+                showCustomMsg("Inspeksi Selesai!", "Sempurna! Semua kelalaian sanitasi operator lab telah dibenahi sesuai standar GMP.", "success");
+            }
+        }
+    </script>
+
+    <script>
+        const MEMORY_ITEMS_DB = [
+            { id: 1, name: "Cutter", icon: "🥣" },
+            { id: 2, name: "Grinder", icon: "⚙️" },
+            { id: 3, name: "Steamer", icon: "🌡️" },
+            { id: 4, name: "Sealer", icon: "📦" }
+        ];
+
+        function renderGameMemory(container) {
+            appState.memoryCards = [];
+            appState.memorySelected = [];
+            appState.memoryLock = false;
+            appState.memoryMatches = 0;
+
+            container.innerHTML = `
+                <div class="space-y-4 text-slate-800 dark:text-slate-100">
+                    <div class="text-center md:text-left">
+                        <h4 class="brand-text text-sm md:text-base font-bold text-brandBlue-900 dark:text-white">Tantangan E: Memory Match Alat Lab</h4>
+                        <p class="text-[11px] text-slate-500">Temukan pasangan ikon alat pengolahan daging yang sama di balik kartu!</p>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2.5 max-w-xs mx-auto" id="memory-cards-grid"></div>
+                </div>
+            `;
+
+            const rawCards = [...MEMORY_ITEMS_DB, ...MEMORY_ITEMS_DB];
+            appState.memoryCards = rawCards.map((x, idx) => ({ ...x, uniqueId: idx, state: "closed" })).sort(() => 0.5 - Math.random());
+
+            const grid = document.getElementById('memory-cards-grid');
+            appState.memoryCards.forEach((card, idx) => {
+                const item = document.createElement('button');
+                item.id = `mem-card-${idx}`;
+                item.onclick = () => flipMemoryCard(idx);
+                item.className = "perspective-1000 w-16 h-16 bg-brandBlue-900 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow transition-transform hover:scale-105 outline-none";
+                item.innerHTML = `❓`;
+                grid.appendChild(item);
+            });
+        }
+
+        function flipMemoryCard(idx) {
+            if (appState.memoryLock) return;
+            const card = appState.memoryCards[idx];
+            if (card.state !== "closed") return;
+
+            playSound(400, 0.05);
+            card.state = "open";
+            
+            const btn = document.getElementById(`mem-card-${idx}`);
+            btn.className = "w-16 h-16 bg-white dark:bg-slate-800 border border-brandOrange-500 rounded-2xl flex items-center justify-center text-xl shadow transition-all duration-300 rotate-y-180";
+            btn.innerHTML = card.icon;
+
+            appState.memorySelected.push({ idx, card });
+
+            if (appState.memorySelected.length === 2) {
+                appState.memoryLock = true;
+                setTimeout(checkMemoryPair, 800);
+            }
+        }
+
+        function checkMemoryPair() {
+            const [first, second] = appState.memorySelected;
+            if (first.card.id === second.card.id) {
+                playCorrectSound();
+                first.card.state = "matched";
+                second.card.state = "matched";
+
+                const b1 = document.getElementById(`mem-card-${first.idx}`);
+                const b2 = document.getElementById(`mem-card-${second.idx}`);
+                b1.className = "w-16 h-16 bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-500 rounded-2xl flex items-center justify-center text-xl shadow transition pointer-events-none";
+                b2.className = "w-16 h-16 bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-500 rounded-2xl flex items-center justify-center text-xl shadow transition pointer-events-none";
+
+                appState.memoryMatches++;
+                if (appState.memoryMatches === MEMORY_ITEMS_DB.length) {
+                    markProgress('g_memory');
+                    showCustomMsg("Sempurna!", "Hebat! Seluruh kartu pasangan alat laboratorium pengolahan daging terpasang pas.", "success");
+                }
+            } else {
+                playWrongSound();
+                first.card.state = "closed";
+                second.card.state = "closed";
+
+                const b1 = document.getElementById(`mem-card-${first.idx}`);
+                const b2 = document.getElementById(`mem-card-${second.idx}`);
+
+                b1.className = "w-16 h-16 bg-brandBlue-900 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow transition-transform hover:scale-105 outline-none";
+                b1.innerHTML = `❓`;
+                b2.className = "w-16 h-16 bg-brandBlue-900 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow transition-transform hover:scale-105 outline-none";
+                b2.innerHTML = `❓`;
+            }
+
+            appState.memorySelected = [];
+            appState.memoryLock = false;
+        }
+
+        // Game F: Spin Wheel
+        const GAME_WHEEL_QUES = [
+            { text: "Berapakah suhu pendinginan/pembekuan standard produk nugget?", ans: "Nugget beku harus disimpan stabil pada suhu ≤ -18°C." },
+            { text: "Apa akibat jika adonan giling melampaui suhu kritis 15°C?", ans: "Protein miosin menderita denaturasi panas dan emulsi pecah (becek)." },
+            { text: "Kenapa nugget dikukus di dalam cetakan suhu 100°C?", ans: "Guna mematangkan pati tapioka dan memicu denaturasi protein miosin jadi gel." },
+            { text: "Apa fungsi penambahan BTP pengawet jenis fosfat STPP?", ans: "Menaikkan pH daging menjauhi isoelektrik sehingga daya ikat air (WHC) naik." }
+        ];
+
+        function renderGameWheel(container) {
+            container.innerHTML = `
+                <div class="space-y-4 text-slate-800 dark:text-slate-100">
+                    <div class="text-center md:text-left">
+                        <h4 class="brand-text text-sm md:text-base font-bold text-brandBlue-900 dark:text-white">Tantangan F: Roda Kuis Sektor Keberuntungan</h4>
+                        <p class="text-[11px] text-slate-500">Putar roda untuk mendapatkan pertanyaan sains secara acak!</p>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                        <div class="relative w-44 h-44 flex flex-col items-center justify-center">
+                            <canvas id="wheel-canvas" width="160" height="160" class="rounded-full shadow-lg border-2 border-slate-300"></canvas>
+                            <div class="absolute -top-1 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[14px] border-t-red-600 z-10"></div>
+                            <button onclick="spinGameWheel()" id="spin-btn" class="absolute w-10 h-10 bg-brandBlue-900 text-white text-[9px] font-black rounded-full border-2 border-white flex items-center justify-center shadow-lg z-10">SPIN</button>
+                        </div>
+
+                        <div class="flex-grow max-w-sm bg-white dark:bg-slate-800 border rounded-2xl p-4 min-h-[120px] flex flex-col justify-center text-center" id="wheel-question-box">
+                            <span class="text-xs text-slate-400 italic">Klik tombol "SPIN" di tengah roda!</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            drawWheelCanvas(0);
+        }
+
+        let wheelColors = ["#0c4a6e", "#16a34a", "#ea580c", "#4f46e5"];
+        function drawWheelCanvas(startAngle) {
+            const canvas = document.getElementById('wheel-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const half = canvas.width / 2;
+            const arc = Math.PI / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            GAME_WHEEL_QUES.forEach((item, idx) => {
+                let angle = startAngle + idx * arc;
+                ctx.fillStyle = wheelColors[idx];
+                ctx.beginPath();
+                ctx.arc(half, half, half - 2, angle, angle + arc, false);
+                ctx.lineTo(half, half);
+                ctx.fill();
+
+                ctx.save();
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 8px sans-serif";
+                ctx.translate(half + Math.cos(angle + arc/2) * 50, half + Math.sin(angle + arc/2) * 50);
+                ctx.rotate(angle + arc/2 + Math.PI/2);
+                ctx.fillText(`SEKTOR ${idx+1}`, -ctx.measureText(`SEKTOR ${idx+1}`).width/2, 0);
+                ctx.restore();
+            });
+        }
+
+        function spinGameWheel() {
+            if (appState.wheelInAction) return;
+            appState.wheelInAction = true;
+            playSound(800, 0.1, "square");
+
+            let spinTime = 0;
+            let totalTime = 2000;
+            let startAngle = Math.random() * Math.PI;
+            let currentAngle = 0;
+
+            function animate() {
+                spinTime += 30;
+                if (spinTime >= totalTime) {
+                    appState.wheelInAction = false;
+                    let deg = (currentAngle * 180 / Math.PI) + 90;
+                    let idx = Math.floor((360 - (deg % 360)) / 90);
+                    if (idx < 0) idx = GAME_WHEEL_QUES.length + idx;
+                    idx = idx % GAME_WHEEL_QUES.length;
+
+                    renderWheelQuestion(idx);
+                    return;
+                }
+                currentAngle += (0.15 * Math.PI);
+                drawWheelCanvas(currentAngle);
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function renderWheelQuestion(idx) {
+            playCorrectSound();
+            const q = GAME_WHEEL_QUES[idx];
+            const box = document.getElementById('wheel-question-box');
+            
+            box.innerHTML = `
+                <div class="space-y-3 text-left animate-fade-in text-slate-800 dark:text-slate-100">
+                    <span class="bg-brandOrange-100 text-brandOrange-700 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Keberuntungan Sektor ${idx + 1}</span>
+                    <h5 class="font-extrabold text-xs leading-tight">${q.text}</h5>
+                    <div class="border-t pt-2 space-y-2">
+                        <button onclick="revealWheelAns('${idx}')" class="px-3 py-1 bg-brandGreen-600 text-white rounded text-[10px] font-bold">Buka Jawaban Sains</button>
+                        <p id="wheel-ans-lbl-${idx}" class="hidden text-[11px] text-slate-500 italic bg-slate-50 dark:bg-slate-900 p-2 border rounded-xl leading-normal"></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function revealWheelAns(idx) {
+            playSound(440, 0.05);
+            const el = document.getElementById(`wheel-ans-lbl-${idx}`);
+            el.innerText = GAME_WHEEL_QUES[idx].ans;
+            el.classList.remove('hidden');
+            markProgress('g_wheel');
+        }
+
+        // Game G: Benar/Salah
+        const GAME_BS_QUES = [
+            { q: "Minyak goreng dingin dapat menggantikan es batu pada silent cutter.", correct: false, desc: "Salah! Hanya es batu/air dingin yang mampu melepaskan hidrasi pati sambil menurunkan suhu kritis adonan." },
+            { q: "Daging ayam beku harus melalui thawing pelan chiller 0-2°C sebelum digiling.", correct: true, desc: "Benar! Thawing lambat menjaga serat miofibril miosin tidak rusak terpotong paksa mesin." }
+        ];
+        let gameBsIndex = 0;
+
+        function renderGameBS(container) {
+            gameBsIndex = 0;
+            renderBsQuestion(container);
+        }
+
+        function renderBsQuestion(container) {
+            if (gameBsIndex >= GAME_BS_QUES.length) {
+                markProgress('g_bs');
+                showCustomMsg("Game Benar/Salah Tuntas!", "Hebat! Anda menyelesaikan semua uji kompetensi taktis Benar atau Salah.", "success");
+                selectGameTab('bahan');
+                return;
+            }
+
+            const q = GAME_BS_QUES[gameBsIndex];
+            container.innerHTML = `
+                <div class="space-y-4 text-slate-800 dark:text-slate-100 text-center max-w-sm mx-auto animate-fade-in">
+                    <span class="text-[9px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Tantangan G: Kuis Benar / Salah</span>
+                    <p class="font-extrabold text-xs md:text-sm mt-2 leading-relaxed">${q.q}</p>
+                    
+                    <div class="flex space-x-3 justify-center pt-2">
+                        <button onclick="submitGameBsAnswer(true)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md">BENAR</button>
+                        <button onclick="submitGameBsAnswer(false)" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-md">SALAH</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function submitGameBsAnswer(ans) {
+            const q = GAME_BS_QUES[gameBsIndex];
+            if (ans === q.correct) {
+                playCorrectSound();
+                showCustomMsg("JAWABAN BENAR!", q.desc, "success");
+            } else {
+                playWrongSound();
+                showCustomMsg("JAWABAN SALAH!", q.desc, "error");
+            }
+            gameBsIndex++;
+            renderBsQuestion(document.getElementById('game-workspace'));
+        }
+    </script>
+
+    <script>
+        function initLatihanSession() {
+            appState.latihanQuestions = [...LATIHAN_SOAL_DATABASE].sort(() => 0.5 - Math.random());
+            appState.latihanIndex = 0;
+            appState.latihanScore = 0;
+            renderLatihanQuestion();
+        }
+
+        function renderLatihanQuestion() {
+            const container = document.getElementById('lat-question-card');
+            container.innerHTML = "";
+
+            if (appState.latihanIndex >= appState.latihanQuestions.length) {
+                completeLatihanSession();
+                return;
+            }
+
+            document.getElementById('lat-progress-lbl').innerText = `${appState.latihanIndex + 1} / ${appState.latihanQuestions.length}`;
+            document.getElementById('lat-score-lbl').innerText = appState.latihanScore;
+
+            const q = appState.latihanQuestions[appState.latihanIndex];
+            container.innerHTML = `
+                <div class="space-y-3 animate-fade-in text-slate-800 dark:text-slate-100">
+                    <span class="text-[9px] bg-brandBlue-100 text-brandBlue-700 dark:bg-brandBlue-950 dark:text-brandBlue-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Soal Latihan ${appState.latihanIndex + 1}</span>
+                    <h4 class="font-extrabold text-xs md:text-sm leading-relaxed">${q.q}</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-2" id="lat-opt-grid"></div>
+                </div>
+            `;
+
+            const grid = document.getElementById('lat-opt-grid');
+            ["a", "b", "c", "d"].forEach(key => {
+                const optBtn = document.createElement('button');
+                optBtn.onclick = () => submitLatihanAnswer(key);
+                optBtn.className = "lat-opt-btn p-3 bg-white dark:bg-slate-800 hover:bg-slate-100 border dark:border-slate-700 rounded-xl text-left text-xs font-semibold leading-snug shadow-sm flex items-center space-x-2";
+                optBtn.innerHTML = `<span class="bg-brandBlue-900 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 uppercase">${key}</span><span>${q[key]}</span>`;
+                grid.appendChild(optBtn);
+            });
+        }
+
+        function submitLatihanAnswer(key) {
+            const q = appState.latihanQuestions[appState.latihanIndex];
+            const buttons = document.querySelectorAll('.lat-opt-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            const isCorrect = (key === q.correct);
+            if (isCorrect) {
+                playCorrectSound();
+                appState.latihanScore += 5;
+            } else {
+                playWrongSound();
+            }
+
+            document.getElementById('lat-score-lbl').innerText = appState.latihanScore;
+
+            const card = document.getElementById('lat-question-card');
+            const panel = document.createElement('div');
+            panel.className = `p-3.5 rounded-xl border text-xs leading-relaxed animate-fade-in mt-4 ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'}`;
+            panel.innerHTML = `
+                <p class="font-bold flex items-center space-x-1">
+                    <i class="${isCorrect ? 'fa-solid fa-circle-check text-emerald-600' : 'fa-solid fa-circle-xmark text-red-600'}"></i>
+                    <span>${isCorrect ? 'BENAR!' : 'SALAH!'}</span>
+                </p>
+                <p class="text-slate-600 dark:text-slate-300 mt-1">${q.desc}</p>
+                <button onclick="advanceLatihanIndex()" class="mt-3 px-4 py-2 bg-brandBlue-900 hover:bg-brandBlue-800 text-white rounded-xl text-[10px] font-bold uppercase tracking-wider">Soal Selanjutnya <i class="fa-solid fa-arrow-right"></i></button>
+            `;
+            card.appendChild(panel);
+        }
+
+        function advanceLatihanIndex() {
+            appState.latihanIndex++;
+            renderLatihanQuestion();
+        }
+
+        function completeLatihanSession() {
+            playCorrectSound();
+            const container = document.getElementById('lat-question-card');
+            container.innerHTML = `
+                <div class="text-center space-y-4 py-4 text-slate-800 dark:text-slate-100 animate-fade-in">
+                    <span class="text-5xl">🏆</span>
+                    <h4 class="brand-text text-xl font-bold text-brandBlue-900 dark:text-white">Latihan Mandiri Selesai!</h4>
+                    <p class="text-xs text-slate-500">Anda berhasil menyelesaikan kuis latihan mandiri kognitif.</p>
+                    <div class="bg-white dark:bg-slate-800 border dark:border-slate-700 p-3 rounded-2xl max-w-xs mx-auto text-center">
+                        <span class="text-[9px] uppercase font-bold text-slate-400">Total Skor Diperoleh</span>
+                        <p class="text-2xl font-black text-brandOrange-500">${appState.latihanScore} / 100</p>
+                    </div>
+                    <button onclick="showScreen('screen-menu')" class="px-5 py-2.5 bg-brandBlue-900 text-white rounded-xl text-xs font-bold transition">Kembali ke Menu Utama</button>
+                </div>
+            `;
+        }
+
+        // Evaluasi Akhir State & Logika Kuis (15 Soal)
+        function initEvalSession() {
+            appState.evalIndex = 0;
+            appState.evalScore = 0;
+            appState.evalAnswers = [];
+            renderEvalQuestion();
+        }
+
+        function renderEvalQuestion() {
+            const container = document.getElementById('eval-question-card');
+            container.innerHTML = "";
+
+            const totalPG = EVAL_PG_DATABASE.length;
+            const totalBS = EVAL_BS_DATABASE.length;
+            const totalQ = totalPG + totalBS;
+
+            if (appState.evalIndex >= totalQ) {
+                completeEvalSession();
+                return;
+            }
+
+            document.getElementById('eval-progress-lbl').innerText = `${appState.evalIndex + 1} / ${totalQ}`;
+            document.getElementById('eval-score-lbl').innerText = appState.evalScore;
+
+            if (appState.evalIndex < totalPG) {
+                const q = EVAL_PG_DATABASE[appState.evalIndex];
+                container.innerHTML = `
+                    <div class="space-y-3 animate-fade-in text-slate-800 dark:text-slate-100">
+                        <span class="text-[9px] bg-brandOrange-100 text-brandOrange-700 dark:bg-brandOrange-950 dark:text-brandOrange-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Bagian I: Pilihan Ganda (CCP)</span>
+                        <h4 class="font-extrabold text-xs md:text-sm leading-relaxed">${q.q}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-2" id="eval-opt-grid"></div>
+                    </div>
+                `;
+
+                const grid = document.getElementById('eval-opt-grid');
+                ["a", "b", "c", "d"].forEach(key => {
+                    const optBtn = document.createElement('button');
+                    optBtn.onclick = () => submitEvalAnswer(key, true);
+                    optBtn.className = "eval-opt-btn p-3 bg-white dark:bg-slate-800 hover:bg-slate-100 border dark:border-slate-700 rounded-xl text-left text-xs font-semibold leading-snug shadow-sm flex items-center space-x-2";
+                    optBtn.innerHTML = `<span class="bg-brandOrange-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 uppercase">${key}</span><span>${q[key]}</span>`;
+                    grid.appendChild(optBtn);
+                });
+            } else {
+                const bsIdx = appState.evalIndex - totalPG;
+                const q = EVAL_BS_DATABASE[bsIdx];
+                container.innerHTML = `
+                    <div class="space-y-3 animate-fade-in text-slate-800 dark:text-slate-100 text-center max-w-sm mx-auto">
+                        <span class="text-[9px] bg-brandOrange-100 text-brandOrange-700 dark:bg-brandOrange-950 dark:text-brandOrange-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Bagian II: Benar atau Salah</span>
+                        <p class="font-extrabold text-xs md:text-sm mt-3 leading-relaxed">${q.q}</p>
+                        
+                        <div class="flex space-x-4 justify-center pt-3">
+                            <button onclick="submitEvalAnswer('Benar', false)" class="eval-opt-btn px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md">BENAR</button>
+                            <button onclick="submitEvalAnswer('Salah', false)" class="eval-opt-btn px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-md">SALAH</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function submitEvalAnswer(ans, isPG) {
+            let isCorrect = false;
+            let dbQ = null;
+
+            if (isPG) {
+                dbQ = EVAL_PG_DATABASE[appState.evalIndex];
+                isCorrect = (ans === dbQ.correct);
+            } else {
+                const bsIdx = appState.evalIndex - EVAL_PG_DATABASE.length;
+                dbQ = EVAL_BS_DATABASE[bsIdx];
+                isCorrect = (ans === dbQ.correct);
+            }
+
+            if (isCorrect) {
+                playCorrectSound();
+                appState.evalScore += 10;
+            } else {
+                playWrongSound();
+            }
+
+            document.getElementById('eval-score-lbl').innerText = appState.evalScore;
+
+            const card = document.getElementById('eval-question-card');
+            const panel = document.createElement('div');
+            panel.className = `p-3.5 rounded-xl border text-xs leading-relaxed animate-fade-in mt-4 ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'}`;
+            panel.innerHTML = `
+                <p class="font-bold flex items-center space-x-1">
+                    <i class="${isCorrect ? 'fa-solid fa-circle-check text-emerald-600' : 'fa-solid fa-circle-xmark text-red-600'}"></i>
+                    <span>${isCorrect ? 'JAWABAN ANDA BENAR!' : 'JAWABAN ANDA SALAH!'}</span>
+                </p>
+                <p class="text-slate-600 dark:text-slate-300 mt-1">${dbQ.desc}</p>
+                <button onclick="advanceEvalIndex()" class="mt-3 px-4 py-2 bg-brandOrange-500 hover:bg-brandOrange-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-wider">Lanjut Evaluasi <i class="fa-solid fa-arrow-right"></i></button>
+            `;
+            card.appendChild(panel);
+        }
+
+        function advanceEvalIndex() {
+            appState.evalIndex++;
+            renderEvalQuestion();
+        }
+
+        function completeEvalSession() {
+            playCorrectSound();
+            const totalQ = EVAL_PG_DATABASE.length + EVAL_BS_DATABASE.length;
+            const maxScore = totalQ * 10;
+            const finalPercentage = Math.round((appState.evalScore / maxScore) * 100);
+
+            let category = "Perlu Belajar Lagi";
+            let color = "text-red-600";
+            if (finalPercentage >= 90) {
+                category = "Sangat Baik";
+                color = "text-emerald-600";
+            } else if (finalPercentage >= 80) {
+                category = "Baik";
+                color = "text-green-600";
+            } else if (finalPercentage >= 65) {
+                category = "Cukup";
+                color = "text-amber-500";
+            }
+
+            const container = document.getElementById('eval-question-card');
+            container.innerHTML = `
+                <div class="text-center space-y-4 py-4 text-slate-800 dark:text-slate-100 animate-fade-in">
+                    <span class="text-5xl">🎓</span>
+                    <h4 class="brand-text text-xl font-bold text-brandBlue-900 dark:text-white">Uji Evaluasi Akhir Selesai!</h4>
+                    
+                    <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto pt-2">
+                        <div class="bg-white dark:bg-slate-800 border dark:border-slate-700 p-3 rounded-2xl">
+                            <span class="text-[9px] uppercase font-bold text-slate-400">Nilai Persentase</span>
+                            <p class="text-2xl font-black text-brandOrange-500">${finalPercentage}%</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 border dark:border-slate-700 p-3 rounded-2xl">
+                            <span class="text-[9px] uppercase font-bold text-slate-400">Kategori Hasil</span>
+                            <p class="text-xs font-extrabold ${color} mt-2.5">${category}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center space-x-2 max-w-xs mx-auto">
+                        <button onclick="printNilaiSummary(${finalPercentage}, '${category}')" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg border flex items-center space-x-1.5"><i class="fa-solid fa-print"></i> <span>Cetak Nilai</span></button>
+                        <button onclick="showScreen('screen-menu')" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-xs font-bold rounded-lg border flex items-center space-x-1.5"><span>Tutup</span></button>
+                    </div>
+
+                    <div id="cert-box-anchor" class="max-w-xs mx-auto pt-2"></div>
+                </div>
+            `;
+
+            const anchor = document.getElementById('cert-box-anchor');
+            if (finalPercentage >= 80) {
+                anchor.innerHTML = `
+                    <div class="bg-emerald-50 dark:bg-emerald-950/20 p-4 border border-emerald-300 dark:border-emerald-800 rounded-2xl space-y-3">
+                        <p class="text-xs text-emerald-800 dark:text-emerald-400 font-bold"><i class="fa-solid fa-trophy animate-bounce mr-1"></i> Nilai Anda memenuhi syarat kelulusan (>= 80)!</p>
+                        <button onclick="triggerCertificate('${category}')" class="w-full py-2 bg-brandGreen-600 hover:bg-brandGreen-700 text-white rounded-xl text-xs font-extrabold transition shadow"><i class="fa-solid fa-print mr-1"></i> Cetak Sertifikat Kompetensi</button>
+                    </div>
+                `;
+            } else {
+                anchor.innerHTML = `
+                    <div class="bg-amber-50 dark:bg-amber-950/20 p-4 border border-amber-300 dark:border-amber-800 rounded-2xl space-y-2">
+                        <p class="text-xs text-amber-800 dark:text-amber-400 font-bold">⚠️ Nilai Anda belum memenuhi batas kelulusan sertifikat (80). Silakan ulangi evaluasi kuis kembali.</p>
+                        <button onclick="initEvalSession()" class="w-full py-2 bg-brandOrange-500 text-white rounded-xl text-xs font-bold transition">Ulangi Ujian Evaluasi</button>
+                    </div>
+                `;
+            }
+        }
+
+        function triggerCertificate(predikatText) {
+            playSound(523, 0.15);
+            document.getElementById('cert-modal').classList.remove('hidden');
+            document.getElementById('cert-predikat-lbl').innerText = `GRADUATED - ${predikatText.toUpperCase()}`;
+
+            const date = new Date();
+            const formatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('cert-current-date').innerText = date.toLocaleDateString('id-ID', formatOptions);
+        }
+
+        function closeCertModal() {
+            document.getElementById('cert-modal').classList.add('hidden');
+        }
+
+        // Fungsi Cetak Nilai Secara Luring
+        function printNilaiSummary(persen, kat) {
+            playClickSound();
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Ringkasan Hasil Evaluasi - SMKN 1 Temanggung</title>
+                    <style>
+                        body { font-family: sans-serif; text-align: center; padding: 40px; }
+                        .box { border: 2px solid #0c4a6e; padding: 20px; border-radius: 12px; display: inline-block; }
+                        h2 { color: #0c4a6e; }
+                        .score { font-size: 40px; font-weight: bold; color: #f97316; margin: 10px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="box">
+                        <h2>SMK NEGERI 1 TEMANGGUNG</h2>
+                        <p>Hasil Uji Evaluasi Kompetensi Mandiri</p>
+                        <p>Mata Pelajaran: Pengolahan Hasil Hewani (XI APHP)</p>
+                        <hr>
+                        <p>Nilai Persentase Kognitif:</p>
+                        <div class="score">${persen}%</div>
+                        <p>Kategori Predikat: <strong>${kat.toUpperCase()}</strong></p>
+                        <p>Tanggal Penyelesaian: ${new Date().toLocaleDateString('id-ID')}</p>
+                    </div>
+                    <script>window.print();<\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Fungsi Unduh Berkas Sertifikat Dinamis Secara Luring (Offline Safe)
+        function downloadCertificateOffline() {
+            playClickSound();
+            const studentName = document.getElementById('cert-student-name').value || "NAMA SISWA SMK";
+            const predikat = document.getElementById('cert-predikat-lbl').innerText;
+            const dateStr = document.getElementById('cert-current-date').innerText;
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Sertifikat Kelulusan - ${studentName}</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; background: #fafaf9; text-align: center; padding: 50px; }
+                        .cert-border { border: 10px solid #0c4a6e; padding: 40px; border-radius: 16px; background: white; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+                        .inner-border { border: 4px solid #f97316; padding: 30px; border-radius: 8px; }
+                        h1 { color: #0c4a6e; font-size: 36px; margin-bottom: 5px; }
+                        h3 { color: #f97316; margin-top: 0; }
+                        .name { font-size: 28px; font-weight: bold; border-bottom: 2px dashed #ccc; display: inline-block; padding: 5px 30px; margin: 20px 0; text-transform: uppercase; }
+                        .predikat { background: #0c4a6e; color: white; padding: 8px 24px; border-radius: 9999px; display: inline-block; font-weight: bold; margin-top: 15px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="cert-border">
+                        <div class="inner-border">
+                            <p>SMK NEGERI 1 TEMANGGUNG</p>
+                            <h1>SERTIFIKAT KELULUSAN</h1>
+                            <h3>Materi: Pembuatan Chicken Nugget (XI APHP)</h3>
+                            <p>Diberikan kepada:</p>
+                            <div class="name">${studentName}</div>
+                            <p>Telah dinyatakan lulus kriteria kognitif pembelajaran mandiri dengan predikat:</p>
+                            <div class="predikat">${predikat}</div>
+                            <p style="margin-top: 40px;">Temanggung, ${dateStr}</p>
+                            <p><strong>Dwi Susanti, S.TP.</strong><br>Guru Agribisnis Pengolahan Hasil Hewani</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const tempLink = document.createElement('a');
+            tempLink.href = URL.createObjectURL(blob);
+            tempLink.download = `Sertifikat_Nugget_${studentName.replace(/\s+/g, '_')}.html`;
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+        }
+    </script>
+</body>
+</html>
